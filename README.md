@@ -1,0 +1,2 @@
+# CodingChallenge
+Example Foursquare application
