@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".details.ui.DetailsFragment"
+    tools:showIn="@layout/activity_details">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_half_screen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.0" />
+
+    <TextView
+        android:id="@+id/details_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:textColor="@color/textPrimary"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/details_is_favorite"
+        app:layout_constraintTop_toTopOf="@+id/guideline_half_screen"
+        tools:text="Name of the place" />
+
+    <TextView
+        android:id="@+id/details_rating"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:textColor="@color/textPrimary"
+        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@+id/details_is_favorite"
+        app:layout_constraintTop_toBottomOf="@+id/details_name"
+        tools:text="4.6" />
+
+    <RatingBar
+        android:id="@+id/details_rating_bar"
+        style="?android:attr/ratingBarStyleSmall"
+        android:layout_width="80dp"
+        android:layout_height="16dp"
+        android:layout_marginStart="8dp"
+        android:isIndicator="true"
+        android:numStars="5"
+        android:stepSize="0.1"
+        app:layout_constraintBottom_toBottomOf="@+id/details_rating"
+        app:layout_constraintStart_toEndOf="@+id/details_rating"
+        app:layout_constraintTop_toTopOf="@+id/details_rating" />
+
+    <TextView
+        android:id="@+id/details_reviews"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:textColor="@color/textPrimary"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@+id/details_rating"
+        app:layout_constraintStart_toEndOf="@id/details_rating_bar"
+        app:layout_constraintTop_toTopOf="@+id/details_rating"
+        tools:text="(416)" />
+
+    <ImageView
+        android:id="@+id/details_is_favorite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:contentDescription="@string/details_favorite_icon_description"
+        android:src="@android:drawable/star_big_on"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline_half_screen"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/details_category"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="@+id/details_rating"
+        app:layout_constraintTop_toBottomOf="@+id/details_rating"
+        tools:text="Mexican Restaurant" />
+
+    <TextView
+        android:id="@+id/details_address"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
+        android:textColor="@color/textSecondary"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@+id/details_is_favorite"
+        app:layout_constraintTop_toBottomOf="@+id/details_category"
+        tools:text="1600 7th Ave Ste 105 (Olive Way)" />
+
+    <TextView
+        android:id="@+id/details_hours"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        tools:text="Open till 7pm"
+        app:layout_constraintBottom_toBottomOf="@+id/details_rating_bar"
+        app:layout_constraintStart_toEndOf="@+id/details_reviews"
+        app:layout_constraintTop_toTopOf="@+id/details_rating_bar" />
+
+    <TextView
+        android:id="@+id/details_web"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="24dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:lines="1"
+        android:ellipsize="end"
+        android:background="?selectableItemBackground"
+        android:drawableStart="@drawable/web"
+        android:drawablePadding="16dp"
+        android:gravity="center_vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/details_address"
+        tools:text="https:\/\/foursquare.com\/v\/columbia-tower-club\/451c049bf964a520803a1fe3"/>
+
+    <TextView
+        android:id="@+id/details_phone"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:drawableStart="@drawable/phone"
+        android:drawablePadding="16dp"
+        android:gravity="center_vertical"
+        android:background="?selectableItemBackground"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/details_web"
+        tools:text="(206) 529-8810"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

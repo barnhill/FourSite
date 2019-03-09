@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context="com.pnuema.android.codingchallenge.mainscreen.ui.MainActivity">
+
+    <item
+        android:id="@+id/menu_item_location_search"
+        android:icon="?searchDrawable"
+        android:title="@string/search_locations"
+        app:showAsAction="always"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        tools:ignore="AlwaysShowAction" />
+
+</menu>

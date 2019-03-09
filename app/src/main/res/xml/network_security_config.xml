@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- this file allows connection with Charles Proxy to monitor traffic locally and overrides only debug builds with user certs -->
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+
+    <debug-overrides>
+        <trust-anchors>
+            <certificates src="user" />
+        </trust-anchors>
+    </debug-overrides>
+
+    <!-- Force domains to use TLS -->
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">api.foursquare.com</domain>
+    </domain-config>
+
+</network-security-config>
