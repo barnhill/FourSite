@@ -13,14 +13,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.snackbar.Snackbar
 import com.pnuema.android.codingchallenge.R
 import com.pnuema.android.codingchallenge.api.LocationResultsListener
+import com.pnuema.android.codingchallenge.fullmap.ui.FullMapActivity
 import com.pnuema.android.codingchallenge.mainscreen.requests.SearchRequest
 import com.pnuema.android.codingchallenge.mainscreen.ui.adapters.SearchResultsAdapter
 import com.pnuema.android.codingchallenge.mainscreen.ui.models.LocationResult
-import com.pnuema.android.codingchallenge.fullmap.ui.FullMapActivity
 import com.pnuema.android.codingchallenge.mainscreen.ui.viewmodels.MainScreenViewModel
 import io.reactivex.Observable
 import io.reactivex.ObservableOnSubscribe
@@ -205,6 +206,7 @@ class MainActivity : AppCompatActivity() {
      */
     @UiThread
     private fun setFullMapVisibleState() {
+        main_toggle_full_map.isVisible = true
         if (viewModel.locationResults.isEmpty() || viewModel.searchFilter.isBlank()) {
             //empty or blank query so lets hide the full map button
             val bottomMargin = (main_toggle_full_map.layoutParams as CoordinatorLayout.LayoutParams).bottomMargin
