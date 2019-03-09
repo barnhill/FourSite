@@ -68,12 +68,12 @@
 
     <ImageView
         android:id="@+id/details_is_favorite"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:contentDescription="@string/details_favorite_icon_description"
-        android:src="@android:drawable/star_big_on"
+        android:src="@drawable/star_circle"
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline_half_screen"
