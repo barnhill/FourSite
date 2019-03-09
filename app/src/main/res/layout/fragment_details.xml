@@ -115,20 +115,22 @@
         android:id="@+id/details_web"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:layout_marginTop="24dp"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:lines="1"
-        android:ellipsize="end"
+        android:layout_marginTop="16dp"
         android:background="?selectableItemBackground"
         android:drawableStart="@drawable/web"
         android:drawablePadding="16dp"
+        android:ellipsize="end"
         android:gravity="center_vertical"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:lines="1"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/details_address"
-        tools:text="https:\/\/foursquare.com\/v\/columbia-tower-club\/451c049bf964a520803a1fe3"/>
+        tools:text="https:\/\/foursquare.com\/v\/columbia-tower-club\/451c049bf964a520803a1fe3"
+        tools:visibility="visible" />
 
     <TextView
         android:id="@+id/details_phone"
@@ -140,10 +142,12 @@
         android:drawablePadding="16dp"
         android:gravity="center_vertical"
         android:background="?selectableItemBackground"
+        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/details_web"
-        tools:text="(206) 529-8810"/>
+        tools:text="(206) 529-8810"
+        tools:visibility="visible"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
