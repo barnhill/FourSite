@@ -20,6 +20,22 @@ android {
         }
     }
 
+    signingConfigs {
+        debug {
+            storeFile file("sign/android.keystore")
+            storePassword "bradbarnhill"
+            keyAlias "bradbarnhill"
+            keyPassword "bradbarnhill"
+        }
+
+        release {
+            storeFile file("sign/android.keystore")
+            storePassword "bradbarnhill"
+            keyAlias "bradbarnhill"
+            keyPassword "bradbarnhill"
+        }
+    }
+
     testOptions {
         unitTests.returnDefaultValues = true
     }
