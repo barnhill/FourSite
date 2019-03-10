@@ -49,8 +49,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        viewModel = ViewModelProviders.of(this).get<MainScreenViewModel>(
-            MainScreenViewModel::class.java)
+        viewModel = ViewModelProviders.of(this).get<MainScreenViewModel>(MainScreenViewModel::class.java)
         requestor = SearchRequest()
         adapter = SearchResultsAdapter()
         main_locations_recycler.adapter = adapter
@@ -61,6 +60,8 @@ class MainActivity : AppCompatActivity() {
                 viewModel.searchFilter = queryString
             }
         }
+
+        main_swipe_refresh.setColorSchemeColors(ContextCompat.getColor(this, R.color.colorAccent))
 
         main_swipe_refresh.setOnRefreshListener {
             makeLocationRequest(viewModel.searchFilter)
