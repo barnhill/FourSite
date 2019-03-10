@@ -144,7 +144,7 @@ class DetailsFragment : Fragment() {
             }
         }
 
-        //show or hide the favorites based on if this location has been favorite by the user
+        //show or hide the favorites based on if this location has been favorited by the user
         Executors.newSingleThreadExecutor().submit {
             details.id?.let {locationId ->
                 context?.let { context ->
@@ -173,8 +173,9 @@ class DetailsFragment : Fragment() {
                 }
             }
 
+            //move camera to the detail location without animation, add padding to sides of map area
             val padding = (resources.configuration.smallestScreenWidthDp * 0.40).toInt()
-            googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(latlngBuilder.build(), padding))
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(latlngBuilder.build(), padding))
         }
     }
 
