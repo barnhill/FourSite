@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -19,13 +18,16 @@
         android:id="@+id/details_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
         android:textColor="@color/textPrimary"
         android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/details_is_favorite"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline_half_screen"
         tools:text="Name of the place" />
 
@@ -33,11 +35,10 @@
         android:id="@+id/details_rating"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:textColor="@color/textPrimary"
         android:textSize="12sp"
-        app:layout_constraintStart_toEndOf="@+id/details_is_favorite"
+        app:layout_constraintStart_toStartOf="@+id/details_name"
         app:layout_constraintTop_toBottomOf="@+id/details_name"
         tools:text="4.6" />
 
@@ -68,14 +69,15 @@
 
     <ImageView
         android:id="@+id/details_is_favorite"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
         android:contentDescription="@string/details_favorite_icon_description"
-        android:src="@android:drawable/star_big_on"
+        android:src="@drawable/star_circle"
         android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline_half_screen"
         tools:visibility="visible" />
 
@@ -93,11 +95,11 @@
         android:id="@+id/details_address"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="24dp"
         android:textColor="@color/textSecondary"
         app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintStart_toEndOf="@+id/details_is_favorite"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/details_category"
         tools:text="1600 7th Ave Ste 105 (Olive Way)" />
 
@@ -106,44 +108,55 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        tools:text="Open till 7pm"
         app:layout_constraintBottom_toBottomOf="@+id/details_rating_bar"
         app:layout_constraintStart_toEndOf="@+id/details_reviews"
-        app:layout_constraintTop_toTopOf="@+id/details_rating_bar" />
+        app:layout_constraintTop_toTopOf="@+id/details_rating_bar"
+        tools:text="Open till 7pm" />
 
     <TextView
         android:id="@+id/details_web"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:layout_marginTop="24dp"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:lines="1"
-        android:ellipsize="end"
+        android:layout_marginTop="16dp"
         android:background="?selectableItemBackground"
         android:drawableStart="@drawable/web"
         android:drawablePadding="16dp"
+        android:ellipsize="end"
         android:gravity="center_vertical"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:lines="1"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/details_address"
-        tools:text="https:\/\/foursquare.com\/v\/columbia-tower-club\/451c049bf964a520803a1fe3"/>
+        tools:text="https:\/\/foursquare.com\/v\/columbia-tower-club\/451c049bf964a520803a1fe3"
+        tools:visibility="visible" />
 
     <TextView
         android:id="@+id/details_phone"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
+        android:background="?selectableItemBackground"
         android:drawableStart="@drawable/phone"
         android:drawablePadding="16dp"
         android:gravity="center_vertical"
-        android:background="?selectableItemBackground"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/details_web"
-        tools:text="(206) 529-8810"/>
+        tools:text="(206) 529-8810"
+        tools:visibility="visible" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_end="48dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
