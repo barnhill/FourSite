@@ -15,8 +15,9 @@
 
     <!-- error messages -->
     <string name="error_location_data">Location data was invalid can not navigate to details</string>
-    <string name="request_failed">Failed to retrieve locations</string>
-    <string name="error_favoriting">Invalid location data can not favorite item</string>
+    <string name="request_failed_main">Unable to retrieve locations</string>
+    <string name="request_failed_details">Unable to retrieve location details</string>
+    <string name="error_favoriting">Unable to favorite venue</string>
 
     <!-- content descriptions -->
     <string name="location_item_icon_description">Location category icon</string>
