@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
@@ -22,6 +23,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.material.snackbar.Snackbar
 import com.pnuema.android.codingchallenge.R
 import com.pnuema.android.codingchallenge.details.models.VenueDetail
 import com.pnuema.android.codingchallenge.details.requests.DetailsRequest
@@ -41,6 +43,8 @@ class DetailsFragment : Fragment() {
     }
     private lateinit var viewModel: DetailsViewModel
 
+    private var snackBar: Snackbar? = null
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         viewModel = ViewModelProviders.of(this).get(DetailsViewModel::class.java)
         return inflater.inflate(R.layout.fragment_details, container, false)
@@ -49,6 +53,7 @@ class DetailsFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
+        //handle bad data by going back if no location id
         val locationId = viewModel.locationId
         if (locationId == null) {
             activity?.onBackPressed()
@@ -58,9 +63,39 @@ class DetailsFragment : Fragment() {
         //request the detail information from the API
         val liveResponse: MutableLiveData<VenueDetail> = MutableLiveData()
         liveResponse.observe(this, Observer { venueDetail ->
-            populateScreen(venueDetail)
+            if (venueDetail == null) {
+                //no data returned which is indicative of an error case, so show an error message
+                activity?.let {
+                    activity?.findViewById<CoordinatorLayout>(R.id.details_coordinator)?.let {
+                        snackBar = Snackbar.make(it, R.string.request_failed_details, Snackbar.LENGTH_INDEFINITE)
+                        snackBar?.let { sbar ->
+                            sbar.setActionTextColor(ContextCompat.getColor(it.context, R.color.colorAccent))
+                            sbar.setAction(R.string.retry) {
+                                dismissSnackBar()
+                                DetailsRequest.getLocationDetails(locationId, liveResponse)
+                            }
+                            sbar.show()
+                        }
+                    }
+                }
+            } else {
+                //data returned successfully so lets populate the screen
+                populateScreen(venueDetail)
+            }
         })
+
+        dismissSnackBar()
         DetailsRequest.getLocationDetails(locationId, liveResponse)
+    }
+
+    /**
+     * Dismiss any error message that is showing
+     */
+    private fun dismissSnackBar() {
+        snackBar?.let {
+            it.dismiss()
+            snackBar = null
+        }
     }
 
     /**
@@ -69,17 +104,16 @@ class DetailsFragment : Fragment() {
     private fun populateScreen(venueDetail: VenueDetail?) {
         if (venueDetail == null || !isAdded || context == null) {
             activity?.onBackPressed()
+            return
         }
 
-        val details = venueDetail!!
-
-        viewModel.details = details
+        viewModel.details = venueDetail
 
         //populate the screen with details
-        details_name.text = details.name
+        details_name.text = venueDetail.name
 
-        if (details.ratingSignals != null) {
-            details_reviews.text = getString(R.string.details_review_count_format, details.ratingSignals)
+        if (venueDetail.ratingSignals != null) {
+            details_reviews.text = getString(R.string.details_review_count_format, venueDetail.ratingSignals)
         } else {
             details_reviews.text = getString(R.string.details_review_count_format, 0)
         }
@@ -87,21 +121,21 @@ class DetailsFragment : Fragment() {
         //ratings
         details_rating.text = "0.0"
         details_rating_bar.rating = 0.0f
-        details.rating?.let { ratingScore ->
+        venueDetail.rating?.let { ratingScore ->
             details_rating.text = DecimalFormat("#.##").format(ratingScore.div(2))
             details_rating_bar.rating = (ratingScore.div(2)).toFloat()
 
             //set the ratings bar to the color provided if its available
-            details.ratingColor?.let { ratingColor ->
+            venueDetail.ratingColor?.let { ratingColor ->
                 DrawableCompat.setTint(details_rating_bar.progressDrawable, Color.parseColor("#$ratingColor"))
             }
         }
 
         //hours
-        details_hours.text = details.hours?.status
+        details_hours.text = venueDetail.hours?.status
 
         //address fields
-        details.location?.formattedAddress.let {
+        venueDetail.location?.formattedAddress.let {
             var addressString = ""
             it?.forEach { s ->
                 addressString += s + System.getProperty("line.separator")
@@ -111,18 +145,18 @@ class DetailsFragment : Fragment() {
         }
 
         //category
-        details.categories?.let {
+        venueDetail.categories?.let {
             details_category.text = if (it.isEmpty()) "" else it[0].shortName
         }
 
         //website button
-        if (details.canonicalUrl.isNullOrBlank() && details.shortUrl.isNullOrBlank()) {
+        if (venueDetail.canonicalUrl.isNullOrBlank() && venueDetail.shortUrl.isNullOrBlank()) {
             details_web.visibility = View.GONE
         } else {
-            if (details.canonicalUrl.isNullOrBlank()) {
-                details_web.text = details.shortUrl
+            if (venueDetail.canonicalUrl.isNullOrBlank()) {
+                details_web.text = venueDetail.shortUrl
             } else {
-                details_web.text = details.canonicalUrl
+                details_web.text = venueDetail.canonicalUrl
             }
             details_web.visibility = View.VISIBLE
             details_web.setOnClickListener {
@@ -131,8 +165,8 @@ class DetailsFragment : Fragment() {
         }
 
         //phone button
-        val contact = details.contact
-        val number = details.contact?.phone
+        val contact = venueDetail.contact
+        val number = venueDetail.contact?.phone
         if (contact == null || contact.formattedPhone.isNullOrBlank() || number.isNullOrBlank()) {
             details_phone.visibility = View.GONE
         } else {
@@ -146,7 +180,7 @@ class DetailsFragment : Fragment() {
 
         //show or hide the favorites based on if this location has been favorited by the user
         Executors.newSingleThreadExecutor().submit {
-            details.id?.let {locationId ->
+            venueDetail.id?.let { locationId ->
                 context?.let { context ->
                     val isFavorite = FavoritesDatabase.database(context).favoritesDao().getFavoriteById(locationId).id == locationId
                     details_is_favorite.visibility = if (isFavorite) View.VISIBLE else View.GONE
@@ -166,10 +200,10 @@ class DetailsFragment : Fragment() {
             latlngBuilder.include(MapUtils.pivotLatLong())
 
             //if all fields exist pin the detail location
-            details.location?.lat?.let { lat ->
-                details.location?.lng?.let { lng ->
+            venueDetail.location?.lat?.let { lat ->
+                venueDetail.location?.lng?.let { lng ->
                     latlngBuilder.include(LatLng(lat, lng))
-                    MapUtils.setMarker(googleMap, lat, lng, details.name)
+                    MapUtils.setMarker(googleMap, lat, lng, venueDetail.name)
                 }
             }
 

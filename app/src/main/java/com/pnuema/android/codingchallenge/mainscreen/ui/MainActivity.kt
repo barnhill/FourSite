@@ -64,6 +64,11 @@ class MainActivity : AppCompatActivity() {
         main_swipe_refresh.setColorSchemeColors(ContextCompat.getColor(this, R.color.colorAccent))
 
         main_swipe_refresh.setOnRefreshListener {
+            if (viewModel.searchFilter.isBlank()) {
+                main_swipe_refresh.isRefreshing = false
+                return@setOnRefreshListener
+            }
+
             makeLocationRequest(viewModel.searchFilter)
         }
 
@@ -139,6 +144,13 @@ class MainActivity : AppCompatActivity() {
         super.onSaveInstanceState(outState, outPersistentState)
     }
 
+    /**
+     * Sets the search query on the view model for safe keeping
+     * Will show the refresh progress indicator or hide it based on if a query is being requested.  Will trigger a query
+     * to be made if the provided query string isnt blank.
+     *
+     * @param query Query string which to get results for from the Foursquare API
+     */
     @WorkerThread
     fun setSearchQuery(query: String) {
         viewModel.searchFilter = query
@@ -173,6 +185,9 @@ class MainActivity : AppCompatActivity() {
      * Makes the request to get the locations for this query and will set the resulting list on the adapter which will update the displayed list
      */
     private fun makeLocationRequest(query: String) {
+        if (query.isBlank()) {
+            return
+        }
         main_swipe_refresh.isRefreshing = true
         dismissSnackBar()
         requestor.getLocationResults(query, object : LocationResultsListener {
@@ -184,17 +199,29 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun failed() {
+                //clear the results
+                viewModel.locationResults.clear()
+                setFullMapVisibleState()
+
+                //cancel the progress indicator
                 main_swipe_refresh.isRefreshing = false
-                snackBar = Snackbar.make(findViewById<View>(android.R.id.content), R.string.request_failed, Snackbar.LENGTH_INDEFINITE)
-                snackBar?.let {
-                    it.setActionTextColor(ContextCompat.getColor(this@MainActivity, R.color.colorAccent))
-                    it.setAction(getString(R.string.retry)) { makeLocationRequest(query) }
-                    it.show()
+
+                //show error message
+                snackBar = Snackbar.make(main_coordinator, R.string.request_failed_main, Snackbar.LENGTH_INDEFINITE)
+                snackBar?.let {sbar ->
+                    sbar.setActionTextColor(ContextCompat.getColor(sbar.context, R.color.colorAccent))
+                    sbar.setAction(R.string.retry) {
+                        makeLocationRequest(query)
+                    }
+                    sbar.show()
                 }
             }
         })
     }
 
+    /**
+     * Dismiss any error message that is showing
+     */
     private fun dismissSnackBar() {
         snackBar?.let {
             it.dismiss()
