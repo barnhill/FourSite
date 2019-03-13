@@ -23,12 +23,6 @@ class DatabaseTests {
     }
 
     @Test
-    fun useAppContext() {
-        val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.pnuema.android.codingchallenge", appContext.packageName)
-    }
-
-    @Test
     @Throws(Exception::class)
     fun writeFavoriteAndRead() {
         val favorite = Favorite("1")

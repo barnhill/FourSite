@@ -1,6 +1,5 @@
-package com.pnuema.android.codingchallenge.models
+package com.pnuema.android.codingchallenge.mainscreen.ui.models
 
-import androidx.test.platform.app.InstrumentationRegistry
 import com.pnuema.android.codingchallenge.mainscreen.models.Category
 import com.pnuema.android.codingchallenge.mainscreen.models.Icon
 import com.pnuema.android.codingchallenge.mainscreen.models.Location
@@ -42,12 +41,6 @@ class LocationResultTests {
         category2.icon?.suffix = "suffix"
         (venue.categories as ArrayList).add(category2)
         location = LocationResult(venue)
-    }
-
-    @Test
-    fun useAppContext() {
-        val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.pnuema.android.codingchallenge", appContext.packageName)
     }
 
     @Test
