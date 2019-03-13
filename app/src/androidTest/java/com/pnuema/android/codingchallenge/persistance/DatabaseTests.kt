@@ -28,7 +28,14 @@ class DatabaseTests {
         val favorite = Favorite("1")
         favoriteDAO.addFavorite(favorite)
         val retrievedFav = favoriteDAO.getFavoriteById("1")
-        assertEquals(retrievedFav.id, favorite.id)
+        assertEquals(retrievedFav?.id, favorite.id)
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun readNonFavorite() {
+        val retrievedFav = favoriteDAO.getFavoriteById("345")
+        assertNull(retrievedFav)
     }
 
     @Test
