@@ -15,9 +15,9 @@ class Errors {
          */
         fun showError(view: View, @StringRes message: Int, action: View.OnClickListener?) : Snackbar {
             val snackBar = Snackbar.make(view, message, Snackbar.LENGTH_INDEFINITE)
-            val margin = snackBar.view.context.resources.getDimension(R.dimen.snackbar_margin).toInt()
+            val margin = snackBar.context.resources.getDimension(R.dimen.snackbar_margin).toInt()
             (snackBar.view.layoutParams as ViewGroup.MarginLayoutParams).setMargins(margin)
-            snackBar.view.background = ContextCompat.getDrawable(view.context, R.drawable.snackbar_background)
+            snackBar.view.background = ContextCompat.getDrawable(snackBar.context, R.drawable.snackbar_background)
             snackBar.setActionTextColor(ContextCompat.getColor(snackBar.context, R.color.colorAccent))
             snackBar.behavior
             action?.let {
