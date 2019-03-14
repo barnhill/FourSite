@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">CodingChallenge</string>
+    <string name="search_locations">Search Locations</string>
+    <string name="search_glyph_text">No location results to display</string>
+    <string name="title_activity_full_map">Map</string>
+    <string name="title_activity_details">Location Details</string>
+    <string name="details_review_count_format" translatable="false">(%d)</string>
+
+    <string name="retry">Retry</string>
+    <plurals name="meters">
+        <item quantity="one">%d meter</item>
+        <item quantity="zero">You are here</item>
+        <item quantity="other">%d meters</item>
+    </plurals>
+
+    <!-- error messages -->
+    <string name="error_location_data">Location data was invalid can not navigate to details</string>
+    <string name="request_failed_main">Unable to retrieve locations</string>
+    <string name="request_failed_details">Unable to retrieve location details</string>
+
+    <!-- content descriptions -->
+    <string name="location_item_icon_description">Location category icon</string>
+    <string name="search_glyph_description">Location glyph</string>
+    <string name="details_favorite_icon_description">Location is a favorite</string>
+</resources>
