@@ -30,6 +30,8 @@ import java.util.concurrent.TimeUnit
  * Main screen of the app with search capabilities
  *
  * Displays the list of search results and allows the user to favorite their venues.
+ * Also there is a full map floating action button to take the user to the full map
+ * display of all search results
  */
 class MainActivity : AppCompatActivity() {
     companion object {
@@ -154,11 +156,10 @@ class MainActivity : AppCompatActivity() {
 
         runOnUiThread {
             if (query.isBlank()) {
-                main_swipe_refresh.visibility = View.GONE
-                group_empty_data.visibility = View.VISIBLE
+                toggleEmptyState(true)
+                clearLocationResults()
             } else {
-                main_swipe_refresh.visibility = View.VISIBLE
-                group_empty_data.visibility = View.GONE
+                toggleEmptyState(false)
                 makeLocationRequest(query)
             }
 
@@ -166,11 +167,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Handle standard on back pressed events but intercept back presses
+     * and clear out the search results first before exiting on a subsequent call
+     */
     override fun onBackPressed() {
         searchView?.let {
             if (!it.isIconified) {
                 it.isIconified = true
                 it.onActionViewCollapsed()
+                viewModel.searchFilter = ""
+                clearLocationResults()
                 return
             }
         }
@@ -189,16 +196,12 @@ class MainActivity : AppCompatActivity() {
         requestor.getLocationResults(query, object : LocationResultsListener {
             override fun success(locations: ArrayList<LocationResult>) {
                 main_swipe_refresh.isRefreshing = false
-                adapter.setLocationResults(locations = locations)
-                viewModel.locationResults = locations
-                setFullMapVisibleState()
+                setLocationResults(locations)
             }
 
             override fun failed() {
                 //clear the results
-                viewModel.locationResults.clear()
-                adapter.setLocationResults(locations = viewModel.locationResults)
-                setFullMapVisibleState()
+                clearLocationResults()
 
                 //cancel the progress indicator
                 main_swipe_refresh.isRefreshing = false
@@ -230,6 +233,42 @@ class MainActivity : AppCompatActivity() {
         } else {
             //results exist or the search query is not blank so
             main_toggle_full_map.show()
+        }
+    }
+
+    /**
+     * Set the location results on the view model,
+     * refresh the adapter with the locations so it can display the list of locations,
+     * and update the state of the floating action button for the full map
+     */
+    private fun setLocationResults(locations: ArrayList<LocationResult>) {
+        viewModel.locationResults = locations
+        adapter.setLocationResults(locations = viewModel.locationResults)
+        setFullMapVisibleState()
+    }
+
+    /**
+     * Clears the results saved to the view model,
+     * refresh the adapter with no results,
+     * and set the full map floating action button
+     */
+    private fun clearLocationResults() {
+        viewModel.locationResults.clear()
+        adapter.setLocationResults(locations = viewModel.locationResults)
+        setFullMapVisibleState()
+    }
+
+    /**
+     * Set screen to show the empty message and glyph or show the results and swipe refresh
+     * True sets it to empty, false will display the results with no glyph shown
+     */
+    private fun toggleEmptyState(state: Boolean) {
+        if (state) {
+            main_swipe_refresh.visibility = View.GONE
+            group_empty_data.visibility = View.VISIBLE
+        } else {
+            main_swipe_refresh.visibility = View.VISIBLE
+            group_empty_data.visibility = View.GONE
         }
     }
 }
