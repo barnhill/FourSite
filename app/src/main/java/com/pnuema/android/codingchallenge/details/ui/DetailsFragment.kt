@@ -28,6 +28,7 @@ import com.pnuema.android.codingchallenge.R
 import com.pnuema.android.codingchallenge.details.models.VenueDetail
 import com.pnuema.android.codingchallenge.details.requests.DetailsRequest
 import com.pnuema.android.codingchallenge.details.viewmodels.DetailsViewModel
+import com.pnuema.android.codingchallenge.helpers.Errors
 import com.pnuema.android.codingchallenge.helpers.MapUtils
 import com.pnuema.android.codingchallenge.persistance.FavoritesDatabase
 import kotlinx.android.synthetic.main.fragment_details.*
@@ -67,15 +68,10 @@ class DetailsFragment : Fragment() {
                 //no data returned which is indicative of an error case, so show an error message
                 activity?.let {
                     activity?.findViewById<CoordinatorLayout>(R.id.details_coordinator)?.let {
-                        snackBar = Snackbar.make(it, R.string.request_failed_details, Snackbar.LENGTH_INDEFINITE)
-                        snackBar?.let { sbar ->
-                            sbar.setActionTextColor(ContextCompat.getColor(it.context, R.color.colorAccent))
-                            sbar.setAction(R.string.retry) {
-                                dismissSnackBar()
-                                DetailsRequest.getLocationDetails(locationId, liveResponse)
-                            }
-                            sbar.show()
-                        }
+                        snackBar = Errors.showError(it, R.string.request_failed_details, View.OnClickListener {
+                            dismissSnackBar()
+                            DetailsRequest.getLocationDetails(locationId, liveResponse)
+                        })
                     }
                 }
             } else {
@@ -121,6 +117,7 @@ class DetailsFragment : Fragment() {
         //ratings
         details_rating.text = "0.0"
         details_rating_bar.rating = 0.0f
+        details_rating_bar.visibility = View.VISIBLE
         venueDetail.rating?.let { ratingScore ->
             details_rating.text = DecimalFormat("#.##").format(ratingScore.div(2))
             details_rating_bar.rating = (ratingScore.div(2)).toFloat()
@@ -182,7 +179,8 @@ class DetailsFragment : Fragment() {
         Executors.newSingleThreadExecutor().submit {
             venueDetail.id?.let { locationId ->
                 context?.let { context ->
-                    val isFavorite = FavoritesDatabase.database(context).favoritesDao().getFavoriteById(locationId).id == locationId
+                    val favorite = FavoritesDatabase.database(context).favoritesDao().getFavoriteById(locationId)
+                    val isFavorite = favorite != null && favorite.id == locationId
                     details_is_favorite.visibility = if (isFavorite) View.VISIBLE else View.GONE
                 }
             }

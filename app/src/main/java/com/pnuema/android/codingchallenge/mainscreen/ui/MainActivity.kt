@@ -5,20 +5,17 @@ import android.os.PersistableBundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.animation.AccelerateInterpolator
-import android.view.animation.DecelerateInterpolator
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.snackbar.Snackbar
 import com.pnuema.android.codingchallenge.R
 import com.pnuema.android.codingchallenge.api.LocationResultsListener
 import com.pnuema.android.codingchallenge.fullmap.ui.FullMapActivity
+import com.pnuema.android.codingchallenge.helpers.Errors
 import com.pnuema.android.codingchallenge.mainscreen.requests.SearchRequest
 import com.pnuema.android.codingchallenge.mainscreen.ui.adapters.SearchResultsAdapter
 import com.pnuema.android.codingchallenge.mainscreen.ui.models.LocationResult
@@ -62,7 +59,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         main_swipe_refresh.setColorSchemeColors(ContextCompat.getColor(this, R.color.colorAccent))
-
         main_swipe_refresh.setOnRefreshListener {
             if (viewModel.searchFilter.isBlank()) {
                 main_swipe_refresh.isRefreshing = false
@@ -201,20 +197,14 @@ class MainActivity : AppCompatActivity() {
             override fun failed() {
                 //clear the results
                 viewModel.locationResults.clear()
+                adapter.setLocationResults(locations = viewModel.locationResults)
                 setFullMapVisibleState()
 
                 //cancel the progress indicator
                 main_swipe_refresh.isRefreshing = false
 
                 //show error message
-                snackBar = Snackbar.make(main_coordinator, R.string.request_failed_main, Snackbar.LENGTH_INDEFINITE)
-                snackBar?.let {sbar ->
-                    sbar.setActionTextColor(ContextCompat.getColor(sbar.context, R.color.colorAccent))
-                    sbar.setAction(R.string.retry) {
-                        makeLocationRequest(query)
-                    }
-                    sbar.show()
-                }
+                snackBar = Errors.showError(main_coordinator, R.string.request_failed_main, View.OnClickListener { makeLocationRequest(query) })
             }
         })
     }
@@ -234,14 +224,12 @@ class MainActivity : AppCompatActivity() {
      */
     @UiThread
     private fun setFullMapVisibleState() {
-        main_toggle_full_map.isVisible = true
-        if (viewModel.locationResults.isEmpty() || viewModel.searchFilter.isBlank()) {
+        if (viewModel.locationResults.isEmpty()) {
             //empty or blank query so lets hide the full map button
-            val bottomMargin = (main_toggle_full_map.layoutParams as CoordinatorLayout.LayoutParams).bottomMargin
-            main_toggle_full_map.animate().translationY(main_toggle_full_map.height.toFloat() + bottomMargin).setInterpolator(AccelerateInterpolator(2f)).start()
+            main_toggle_full_map.hide()
         } else {
-            //query is populated so show the action button
-            main_toggle_full_map.animate().translationY(0f).setInterpolator(DecelerateInterpolator(2f)).start()
+            //results exist or the search query is not blank so
+            main_toggle_full_map.show()
         }
     }
 }

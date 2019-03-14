@@ -1,6 +1,5 @@
 package com.pnuema.android.codingchallenge.helpers
 
-import com.pnuema.android.codingchallenge.helpers.MapUtils
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test

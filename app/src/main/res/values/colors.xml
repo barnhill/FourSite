@@ -6,4 +6,6 @@
 
     <color name="textPrimary">#13161a</color>
     <color name="textSecondary">#404040</color>
+
+    <color name="errorBackground">#323232</color>
 </resources>

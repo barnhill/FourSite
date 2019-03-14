@@ -8,7 +8,7 @@ import androidx.room.Query
 @Dao
 interface FavoriteDAO {
     @Query("select * from favorites where id = :ID limit 1")
-    fun getFavoriteById(ID: String): Favorite
+    fun getFavoriteById(ID: String): Favorite?
 
     @Query("delete from favorites where id = :ID")
     fun removeFavoriteById(ID: String)

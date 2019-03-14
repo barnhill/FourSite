@@ -52,9 +52,11 @@
         android:isIndicator="true"
         android:numStars="5"
         android:stepSize="0.1"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="@+id/details_rating"
         app:layout_constraintStart_toEndOf="@+id/details_rating"
-        app:layout_constraintTop_toTopOf="@+id/details_rating" />
+        app:layout_constraintTop_toTopOf="@+id/details_rating"
+        tools:visibility="visible"/>
 
     <TextView
         android:id="@+id/details_reviews"

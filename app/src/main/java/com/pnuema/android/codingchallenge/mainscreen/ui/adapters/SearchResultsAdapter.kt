@@ -13,6 +13,10 @@ class SearchResultsAdapter: RecyclerView.Adapter<LocationResultViewHolder>() {
     private var locationDataItems: List<LocationResult> = ArrayList()
 
     fun setLocationResults(locations: List<LocationResult>) {
+        if (locations.isNullOrEmpty()) {
+            locationDataItems = locations
+            notifyDataSetChanged()
+        }
         val oldItems = ArrayList(locationDataItems)
         locationDataItems = locations
 
