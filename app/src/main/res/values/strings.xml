@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">CodingChallenge</string>
     <string name="search_locations">Search Locations</string>
-    <string name="search_glyph_text">Search for locations by tapping the search button in the title bar</string>
+    <string name="search_glyph_text">No search results to display</string>
     <string name="title_activity_full_map">Map</string>
     <string name="title_activity_details">Location Details</string>
     <string name="details_review_count_format" translatable="false">(%d)</string>
