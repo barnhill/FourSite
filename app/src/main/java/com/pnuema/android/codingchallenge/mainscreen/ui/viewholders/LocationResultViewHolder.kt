@@ -47,7 +47,6 @@ class LocationResultViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(Layo
     private fun setupFavoriteIndicator(locationResult: LocationResult) {
         val context = itemView.context
 
-        itemView.locationFavorite.setOnClickListener(null) //clear click indicator
         itemView.locationFavorite.isChecked = false //set default
 
         locationResult.id?.let {

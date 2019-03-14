@@ -8,4 +8,5 @@
     <color name="textSecondary">#404040</color>
 
     <color name="errorBackground">#323232</color>
+    <color name="listDivider">#e6e7e9</color>
 </resources>
