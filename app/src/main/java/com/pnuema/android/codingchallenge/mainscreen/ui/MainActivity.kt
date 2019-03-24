@@ -1,7 +1,6 @@
 package com.pnuema.android.codingchallenge.mainscreen.ui
 
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -10,21 +9,26 @@ import androidx.annotation.WorkerThread
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.google.android.material.snackbar.Snackbar
 import com.pnuema.android.codingchallenge.R
-import com.pnuema.android.codingchallenge.api.LocationResultsListener
+import com.pnuema.android.codingchallenge.details.ui.DetailsActivity
 import com.pnuema.android.codingchallenge.fullmap.ui.FullMapActivity
 import com.pnuema.android.codingchallenge.helpers.Errors
-import com.pnuema.android.codingchallenge.mainscreen.requests.SearchRequest
 import com.pnuema.android.codingchallenge.mainscreen.ui.adapters.SearchResultsAdapter
 import com.pnuema.android.codingchallenge.mainscreen.ui.models.LocationResult
+import com.pnuema.android.codingchallenge.mainscreen.ui.viewholders.LocationClickListener
 import com.pnuema.android.codingchallenge.mainscreen.ui.viewmodels.MainScreenViewModel
+import com.pnuema.android.codingchallenge.persistance.FavoritesDatabase
+import com.pnuema.android.codingchallenge.persistance.daos.Favorite
 import io.reactivex.Observable
 import io.reactivex.ObservableOnSubscribe
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
+import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 /**
@@ -34,12 +38,11 @@ import java.util.concurrent.TimeUnit
  * Also there is a full map floating action button to take the user to the full map
  * display of all search results
  */
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), LifecycleOwner, LocationClickListener {
     companion object {
         const val STATE_QUERY_STRING = "queryString"
     }
     private lateinit var viewModel: MainScreenViewModel
-    private lateinit var requestor: SearchRequest
     private lateinit var adapter: SearchResultsAdapter
     private var snackBar: Snackbar? = null
     private var searchView: SearchView? = null
@@ -50,31 +53,49 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         viewModel = ViewModelProviders.of(this).get<MainScreenViewModel>(MainScreenViewModel::class.java)
-        requestor = SearchRequest()
-        adapter = SearchResultsAdapter()
+        adapter = SearchResultsAdapter(this)
         main_locations_recycler.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         main_locations_recycler.adapter = adapter
 
         savedInstanceState?.let {
             val query = it.getString(STATE_QUERY_STRING)
             query?.let { queryString ->
-                viewModel.searchFilter = queryString
+                viewModel.setQuery(queryString)
             }
         }
 
         main_swipe_refresh.setColorSchemeColors(ContextCompat.getColor(this, R.color.colorAccent))
         main_swipe_refresh.setOnRefreshListener {
-            if (viewModel.searchFilter.isBlank()) {
+            if (viewModel.searchFilter.value.isNullOrBlank()) {
                 main_swipe_refresh.isRefreshing = false
                 return@setOnRefreshListener
             }
 
-            makeLocationRequest(viewModel.searchFilter)
+            viewModel.refresh()
         }
 
         main_toggle_full_map.setOnClickListener {
-            FullMapActivity.launch(this, viewModel.locationResults)
+            viewModel.locationResults.value?.let {
+                FullMapActivity.launch(this, it)
+            }
         }
+
+        viewModel.locationResults.observe(this, Observer<ArrayList<LocationResult>> {
+            //cancel the progress indicator
+            main_swipe_refresh.isRefreshing = false
+
+            //update adapter with new results
+            adapter.setLocationResults(locations = it)
+            setFullMapVisibleState()
+        })
+
+        viewModel.locationResultsError.observe(this, Observer<String> {
+            if (it == null) {
+                dismissSnackBar()
+            } else {
+                snackBar = Errors.showError(main_coordinator, R.string.request_failed_main, View.OnClickListener { viewModel.refresh() })
+            }
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -105,9 +126,8 @@ class MainActivity : AppCompatActivity() {
 
                     //populate the search filter if this view model already has the filter set
                     //(previous search stored in view model and restoration of screen state)
-                    if (!viewModel.searchFilter.isBlank()) {
+                    if (searchView.isIconified) {
                         view.onActionViewExpanded()
-                        setSearchQuery(viewModel.searchFilter)
                     } else {
                         view.onActionViewCollapsed()
                     }
@@ -139,9 +159,32 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
-        outState?.putString(STATE_QUERY_STRING, viewModel.searchFilter)
-        super.onSaveInstanceState(outState, outPersistentState)
+    /**
+     * Handle clicks on the location view holders and startup the details screen
+     */
+    override fun onLocationClicked(id: String) {
+        DetailsActivity.launch(this, id)
+    }
+
+    /**
+     * Handle clicks on the favorite star to mark a location as a favorite or unfavorite them
+     */
+    override fun onFavoriteClicked(id: String) {
+        Executors.newSingleThreadExecutor().submit {
+            FavoritesDatabase.database(this).favoritesDao().getFavoriteById(id).let { fav ->
+                if (fav == null) {
+                    //add to database since its not in there
+                    Executors.newSingleThreadExecutor().submit {
+                        FavoritesDatabase.database(this).favoritesDao().addFavorite(favorite = Favorite(id))
+                    }
+                } else {
+                    //remove from database
+                    Executors.newSingleThreadExecutor().submit {
+                        FavoritesDatabase.database(this).favoritesDao().removeFavoriteById(id)
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -153,13 +196,13 @@ class MainActivity : AppCompatActivity() {
      */
     @WorkerThread
     fun setSearchQuery(query: String) {
-        viewModel.searchFilter = query
+        viewModel.setQuery(query)
         searchView?.setQuery(query, true)
 
         runOnUiThread {
             if (query.isBlank()) {
                 toggleEmptyState(true)
-                clearLocationResults()
+                viewModel.setQuery("")
             } else {
                 toggleEmptyState(false)
                 makeLocationRequest(query)
@@ -178,8 +221,7 @@ class MainActivity : AppCompatActivity() {
             if (!it.isIconified) {
                 it.isIconified = true
                 it.onActionViewCollapsed()
-                viewModel.searchFilter = ""
-                clearLocationResults()
+                viewModel.setQuery("")
                 return
             }
         }
@@ -195,23 +237,7 @@ class MainActivity : AppCompatActivity() {
         }
         main_swipe_refresh.isRefreshing = true
         dismissSnackBar()
-        requestor.getLocationResults(query, object : LocationResultsListener {
-            override fun success(locations: ArrayList<LocationResult>) {
-                main_swipe_refresh.isRefreshing = false
-                setLocationResults(locations)
-            }
-
-            override fun failed() {
-                //clear the results
-                clearLocationResults()
-
-                //cancel the progress indicator
-                main_swipe_refresh.isRefreshing = false
-
-                //show error message
-                snackBar = Errors.showError(main_coordinator, R.string.request_failed_main, View.OnClickListener { makeLocationRequest(query) })
-            }
-        })
+        viewModel.setQuery(query)
     }
 
     /**
@@ -229,35 +255,13 @@ class MainActivity : AppCompatActivity() {
      */
     @UiThread
     private fun setFullMapVisibleState() {
-        if (viewModel.locationResults.isEmpty()) {
+        if (viewModel.locationResults.value.isNullOrEmpty()) {
             //empty or blank query so lets hide the full map button
             main_toggle_full_map.hide()
         } else {
             //results exist or the search query is not blank so
             main_toggle_full_map.show()
         }
-    }
-
-    /**
-     * Set the location results on the view model,
-     * refresh the adapter with the locations so it can display the list of locations,
-     * and update the state of the floating action button for the full map
-     */
-    private fun setLocationResults(locations: ArrayList<LocationResult>) {
-        viewModel.locationResults = locations
-        adapter.setLocationResults(locations = viewModel.locationResults)
-        setFullMapVisibleState()
-    }
-
-    /**
-     * Clears the results saved to the view model,
-     * refresh the adapter with no results,
-     * and set the full map floating action button
-     */
-    private fun clearLocationResults() {
-        viewModel.locationResults.clear()
-        adapter.setLocationResults(locations = viewModel.locationResults)
-        setFullMapVisibleState()
     }
 
     /**
