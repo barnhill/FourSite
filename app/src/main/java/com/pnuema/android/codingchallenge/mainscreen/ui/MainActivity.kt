@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import com.google.android.material.snackbar.Snackbar
 import com.pnuema.android.codingchallenge.R
 import com.pnuema.android.codingchallenge.api.LocationResultsListener
-import com.pnuema.android.codingchallenge.common.LightGreyDividerDecoration
 import com.pnuema.android.codingchallenge.fullmap.ui.FullMapActivity
 import com.pnuema.android.codingchallenge.helpers.Errors
 import com.pnuema.android.codingchallenge.mainscreen.requests.SearchRequest
@@ -53,7 +52,7 @@ class MainActivity : AppCompatActivity() {
         viewModel = ViewModelProviders.of(this).get<MainScreenViewModel>(MainScreenViewModel::class.java)
         requestor = SearchRequest()
         adapter = SearchResultsAdapter()
-        main_locations_recycler.addItemDecoration(LightGreyDividerDecoration(this, DividerItemDecoration.VERTICAL))
+        main_locations_recycler.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         main_locations_recycler.adapter = adapter
 
         savedInstanceState?.let {

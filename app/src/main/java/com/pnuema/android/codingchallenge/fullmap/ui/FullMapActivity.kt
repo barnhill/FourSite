@@ -15,9 +15,9 @@ import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
 import com.pnuema.android.codingchallenge.R
 import com.pnuema.android.codingchallenge.details.ui.DetailsActivity
+import com.pnuema.android.codingchallenge.fullmap.viewmodels.FullMapViewModel
 import com.pnuema.android.codingchallenge.helpers.MapUtils
 import com.pnuema.android.codingchallenge.mainscreen.ui.models.LocationResult
-import com.pnuema.android.codingchallenge.fullmap.viewmodels.FullMapViewModel
 
 /**
  * Full map screen
@@ -42,6 +42,11 @@ class FullMapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInf
         if (!intent.hasExtra(PARAM_LOCATIONS)) {
             //launched without any locations so go back
             onBackPressed()
+        }
+
+        supportActionBar?.let {
+            it.setDisplayHomeAsUpEnabled(true)
+            it.setDisplayShowTitleEnabled(false)
         }
 
         //setup view model to persist the locations so they survive rotation
@@ -85,6 +90,11 @@ class FullMapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInf
         }
 
         return
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
     }
 
     /**
