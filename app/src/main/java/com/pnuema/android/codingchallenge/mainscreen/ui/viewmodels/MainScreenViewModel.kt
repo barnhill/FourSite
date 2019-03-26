@@ -11,19 +11,11 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class MainScreenViewModel : ViewModel() {
-    var searchFilter: MutableLiveData<String> = MutableLiveData()
+    var searchFilter: String = ""
     var locationResults: MutableLiveData<ArrayList<LocationResult>> = MutableLiveData()
     var locationResultsError: MutableLiveData<String> = MutableLiveData()
 
-    init {
-        searchFilter.observeForever {
-            getLocationResults(it)
-        }
-    }
-
     private fun getLocationResults(query: String) {
-        locationResultsError.postValue(null)
-        locationResults.postValue(ArrayList())
         FoursquareServiceProvider.service.getLocationResults(query = query).enqueue(object :
             Callback<FoursquareResponse> {
             override fun onFailure(call: Call<FoursquareResponse>, t: Throwable) {
@@ -45,13 +37,18 @@ class MainScreenViewModel : ViewModel() {
     }
 
     fun setQuery(query: String) {
-        searchFilter.postValue(query)
+        searchFilter = query
+
+        if (query.isBlank()) {
+            locationResults.postValue(ArrayList())
+            return
+        } else {
+            getLocationResults(searchFilter)
+        }
     }
 
     fun refresh() {
-        searchFilter.value?.let {
-            getLocationResults(it)
-        }
+        getLocationResults(searchFilter)
     }
 
     /**

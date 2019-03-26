@@ -8,6 +8,7 @@ import com.pnuema.android.codingchallenge.glide.GlideApp
 import com.pnuema.android.codingchallenge.mainscreen.ui.models.LocationResult
 import com.pnuema.android.codingchallenge.persistance.FavoritesDatabase
 import kotlinx.android.synthetic.main.location_result_item.view.*
+import java.util.concurrent.Executors
 
 /**
  * View holder for display of the location information on the main screen of the app in a list.
@@ -44,15 +45,13 @@ class LocationResultViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(Layo
     private fun setupFavoriteIndicator(locationResult: LocationResult, clickListener: LocationClickListener) {
         itemView.locationFavorite.isChecked = false //set default
 
-        locationResult.id?.let {
+        locationResult.id?.let {locationId ->
             //set the views state based on what is in the database
-            Thread(
-                Runnable {
-                    FavoritesDatabase.database(itemView.context).favoritesDao().getFavoriteById(it)?.let { fav ->
-                        itemView.locationFavorite.isChecked = fav.id == it
-                    }
+            Executors.newSingleThreadExecutor().submit {
+                FavoritesDatabase.database(itemView.context).favoritesDao().getFavoriteById(locationId)?.let { fav ->
+                    itemView.locationFavorite.isChecked = fav.id == locationId
                 }
-            ).start()
+            }
         }
 
         //handle the status changes for favorites when the user clicks the star

@@ -4,11 +4,13 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
+import androidx.core.view.marginBottom
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -66,7 +68,7 @@ class MainActivity : AppCompatActivity(), LifecycleOwner, LocationClickListener 
 
         main_swipe_refresh.setColorSchemeColors(ContextCompat.getColor(this, R.color.colorAccent))
         main_swipe_refresh.setOnRefreshListener {
-            if (viewModel.searchFilter.value.isNullOrBlank()) {
+            if (viewModel.searchFilter.isBlank()) {
                 main_swipe_refresh.isRefreshing = false
                 return@setOnRefreshListener
             }
@@ -84,9 +86,15 @@ class MainActivity : AppCompatActivity(), LifecycleOwner, LocationClickListener 
             //cancel the progress indicator
             main_swipe_refresh.isRefreshing = false
 
-            //update adapter with new results
-            adapter.setLocationResults(locations = it)
-            setFullMapVisibleState()
+            if (it.isEmpty()) {
+                //set empty state
+                toggleEmptyState(true)
+            } else {
+                //update adapter with new results
+                toggleEmptyState(false)
+                adapter.setLocationResults(locations = it)
+            }
+            setFullMapVisibleState(it)
         })
 
         viewModel.locationResultsError.observe(this, Observer<String> {
@@ -123,14 +131,6 @@ class MainActivity : AppCompatActivity(), LifecycleOwner, LocationClickListener 
                     this.searchView = searchView
                     view.maxWidth = Integer.MAX_VALUE // to make sure it occupies the entire screen width as possible.
                     view.queryHint = getString(com.pnuema.android.codingchallenge.R.string.search_locations)
-
-                    //populate the search filter if this view model already has the filter set
-                    //(previous search stored in view model and restoration of screen state)
-                    if (searchView.isIconified) {
-                        view.onActionViewExpanded()
-                    } else {
-                        view.onActionViewCollapsed()
-                    }
 
                     //watch for more user input before firing off the api requests to cut down on traffic
                     Observable.create(ObservableOnSubscribe<String> { subscriber ->
@@ -196,19 +196,16 @@ class MainActivity : AppCompatActivity(), LifecycleOwner, LocationClickListener 
      */
     @WorkerThread
     fun setSearchQuery(query: String) {
-        viewModel.setQuery(query)
         searchView?.setQuery(query, true)
 
         runOnUiThread {
             if (query.isBlank()) {
-                toggleEmptyState(true)
                 viewModel.setQuery("")
             } else {
-                toggleEmptyState(false)
-                makeLocationRequest(query)
+                main_swipe_refresh.isRefreshing = true
+                dismissSnackBar()
+                viewModel.setQuery(query)
             }
-
-            setFullMapVisibleState()
         }
     }
 
@@ -219,25 +216,11 @@ class MainActivity : AppCompatActivity(), LifecycleOwner, LocationClickListener 
     override fun onBackPressed() {
         searchView?.let {
             if (!it.isIconified) {
-                it.isIconified = true
                 it.onActionViewCollapsed()
-                viewModel.setQuery("")
                 return
             }
         }
         super.onBackPressed()
-    }
-
-    /**
-     * Makes the request to get the locations for this query and will set the resulting list on the adapter which will update the displayed list
-     */
-    private fun makeLocationRequest(query: String) {
-        if (query.isBlank()) {
-            return
-        }
-        main_swipe_refresh.isRefreshing = true
-        dismissSnackBar()
-        viewModel.setQuery(query)
     }
 
     /**
@@ -254,13 +237,15 @@ class MainActivity : AppCompatActivity(), LifecycleOwner, LocationClickListener 
      * Check if the query is empty or not and animate the full map action button to the proper location
      */
     @UiThread
-    private fun setFullMapVisibleState() {
-        if (viewModel.locationResults.value.isNullOrEmpty()) {
+    private fun setFullMapVisibleState(locationResults: ArrayList<LocationResult>) {
+        if (locationResults.isEmpty()) {
             //empty or blank query so lets hide the full map button
+            main_toggle_full_map.animate().translationY((main_toggle_full_map.height + main_toggle_full_map.marginBottom).toFloat()).setInterpolator(AccelerateDecelerateInterpolator()).start()
             main_toggle_full_map.hide()
         } else {
             //results exist or the search query is not blank so
             main_toggle_full_map.show()
+            main_toggle_full_map.animate().translationY(0f).setInterpolator(AccelerateDecelerateInterpolator()).start()
         }
     }
 
@@ -272,6 +257,7 @@ class MainActivity : AppCompatActivity(), LifecycleOwner, LocationClickListener 
         if (state) {
             main_swipe_refresh.visibility = View.GONE
             group_empty_data.visibility = View.VISIBLE
+
         } else {
             main_swipe_refresh.visibility = View.VISIBLE
             group_empty_data.visibility = View.GONE
