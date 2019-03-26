@@ -17,6 +17,7 @@ class SearchResultsAdapter(private val onClickListener: LocationClickListener): 
         if (locations.isNullOrEmpty()) {
             locationDataItems = locations
             notifyDataSetChanged()
+            return
         }
         val oldItems = ArrayList(locationDataItems)
         locationDataItems = locations
