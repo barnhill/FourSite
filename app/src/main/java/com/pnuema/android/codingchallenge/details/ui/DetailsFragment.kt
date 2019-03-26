@@ -16,7 +16,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -26,7 +25,6 @@ import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.material.snackbar.Snackbar
 import com.pnuema.android.codingchallenge.R
 import com.pnuema.android.codingchallenge.details.models.VenueDetail
-import com.pnuema.android.codingchallenge.details.requests.DetailsRequest
 import com.pnuema.android.codingchallenge.details.viewmodels.DetailsViewModel
 import com.pnuema.android.codingchallenge.helpers.Errors
 import com.pnuema.android.codingchallenge.helpers.MapUtils
@@ -56,21 +54,20 @@ class DetailsFragment : Fragment() {
 
         //handle bad data by going back if no location id
         val locationId = viewModel.locationId
-        if (locationId == null) {
+        if (locationId.isBlank()) {
             activity?.onBackPressed()
             return
         }
 
-        //request the detail information from the API
-        val liveResponse: MutableLiveData<VenueDetail> = MutableLiveData()
-        liveResponse.observe(this, Observer { venueDetail ->
+        dismissSnackBar()
+        viewModel.details.observe(viewLifecycleOwner, Observer { venueDetail ->
             if (venueDetail == null) {
                 //no data returned which is indicative of an error case, so show an error message
                 activity?.let {
                     activity?.findViewById<CoordinatorLayout>(R.id.details_coordinator)?.let {
                         snackBar = Errors.showError(it, R.string.request_failed_details, View.OnClickListener {
                             dismissSnackBar()
-                            DetailsRequest.getLocationDetails(locationId, liveResponse)
+                            viewModel.refresh()
                         })
                     }
                 }
@@ -79,9 +76,7 @@ class DetailsFragment : Fragment() {
                 populateScreen(venueDetail)
             }
         })
-
-        dismissSnackBar()
-        DetailsRequest.getLocationDetails(locationId, liveResponse)
+        viewModel.refresh()
     }
 
     /**
@@ -102,8 +97,6 @@ class DetailsFragment : Fragment() {
             activity?.onBackPressed()
             return
         }
-
-        viewModel.details = venueDetail
 
         //populate the screen with details
         details_name.text = venueDetail.name
@@ -229,7 +222,7 @@ class DetailsFragment : Fragment() {
                     details_phone.isEnabled = false
                 } else {
                     //permission granted
-                    val number = viewModel.details?.contact?.phone
+                    val number = viewModel.details.value?.contact?.phone
                     if (!number.isNullOrBlank()) {
                         handleCall(number)
                     }
