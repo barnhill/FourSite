@@ -13,6 +13,10 @@
         <item quantity="other">%d meters</item>
     </plurals>
 
+    <!-- favorite messages -->
+    <string name="added_favorite">Added favorite</string>
+    <string name="removed_favorite">Removed favorite</string>
+
     <!-- error messages -->
     <string name="error_location_data">Location data was invalid can not navigate to details</string>
     <string name="request_failed_main">Unable to retrieve locations</string>

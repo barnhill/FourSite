@@ -29,6 +29,7 @@ import com.pnuema.android.codingchallenge.details.viewmodels.DetailsViewModel
 import com.pnuema.android.codingchallenge.helpers.Errors
 import com.pnuema.android.codingchallenge.helpers.MapUtils
 import com.pnuema.android.codingchallenge.persistance.FavoritesDatabase
+import com.pnuema.android.codingchallenge.persistance.daos.Favorite
 import kotlinx.android.synthetic.main.fragment_details.*
 import java.text.DecimalFormat
 import java.util.concurrent.Executors
@@ -174,7 +175,39 @@ class DetailsFragment : Fragment() {
                 context?.let { context ->
                     val favorite = FavoritesDatabase.database(context).favoritesDao().getFavoriteById(locationId)
                     val isFavorite = favorite != null && favorite.id == locationId
-                    details_is_favorite.visibility = if (isFavorite) View.VISIBLE else View.GONE
+                    details_is_favorite.setImageDrawable(ContextCompat.getDrawable(context, if (isFavorite) R.drawable.star_circle else R.drawable.star_circle_disabled))
+                }
+            }
+        }
+
+        //add click listener for adding/removing favorite locale
+        details_is_favorite.setOnClickListener {
+            Executors.newSingleThreadExecutor().submit {
+                venueDetail.id?.let { locationId ->
+                    context?.let { context ->
+                        val favorite = FavoritesDatabase.database(context).favoritesDao().getFavoriteById(locationId)
+                        val isFavorite = favorite != null && favorite.id == locationId
+
+                        if (isFavorite) {
+                            FavoritesDatabase.database(context).favoritesDao().removeFavoriteById(locationId)
+                            activity?.runOnUiThread {
+                                view?.let {
+                                    Snackbar.make(it, getString(R.string.removed_favorite), Snackbar.LENGTH_SHORT).show()
+                                }
+                            }
+                        } else {
+                            FavoritesDatabase.database(context).favoritesDao().addFavorite(Favorite(locationId))
+                            activity?.runOnUiThread {
+                                view?.let {
+                                    Snackbar.make(it, getString(R.string.added_favorite), Snackbar.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
+
+                        details_is_favorite.setImageDrawable(
+                            ContextCompat.getDrawable(context, if (!isFavorite) R.drawable.star_circle else R.drawable.star_circle_disabled)
+                        )
+                    }
                 }
             }
         }
