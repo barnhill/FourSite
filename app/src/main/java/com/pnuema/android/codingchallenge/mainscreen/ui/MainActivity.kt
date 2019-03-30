@@ -1,5 +1,7 @@
 package com.pnuema.android.codingchallenge.mainscreen.ui
 
+import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -44,8 +46,8 @@ class MainActivity : AppCompatActivity(), LifecycleOwner, LocationClickListener 
     companion object {
         const val STATE_QUERY_STRING = "queryString"
     }
-    private lateinit var viewModel: MainScreenViewModel
-    private lateinit var adapter: SearchResultsAdapter
+    private val viewModel: MainScreenViewModel by lazy { ViewModelProviders.of(this).get<MainScreenViewModel>(MainScreenViewModel::class.java) }
+    private val adapter: SearchResultsAdapter by lazy { SearchResultsAdapter(this) }
     private var snackBar: Snackbar? = null
     private var searchView: SearchView? = null
 
@@ -54,8 +56,6 @@ class MainActivity : AppCompatActivity(), LifecycleOwner, LocationClickListener 
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        viewModel = ViewModelProviders.of(this).get<MainScreenViewModel>(MainScreenViewModel::class.java)
-        adapter = SearchResultsAdapter(this)
         main_locations_recycler.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         main_locations_recycler.adapter = adapter
 
@@ -78,7 +78,7 @@ class MainActivity : AppCompatActivity(), LifecycleOwner, LocationClickListener 
 
         main_toggle_full_map.setOnClickListener {
             viewModel.locationResults.value?.let {
-                FullMapActivity.launch(this, it)
+                startActivityForResult(FullMapActivity.buildIntent(this, it), FullMapActivity.FULLMAP_REQUEST_CODE)
             }
         }
 
@@ -93,7 +93,16 @@ class MainActivity : AppCompatActivity(), LifecycleOwner, LocationClickListener 
                 //update adapter with new results
                 toggleEmptyState(false)
                 adapter.setLocationResults(locations = it)
+
+                viewModel.checkLocationResultsFavorites(this, it, object: MainScreenViewModel.LocationFavoriteChanged{
+                    override fun onFavoriteChangedStatus() {
+                        runOnUiThread {
+                            adapter.setLocationResults(it)
+                        }
+                    }
+                })
             }
+
             setFullMapVisibleState(it)
         })
 
@@ -133,25 +142,7 @@ class MainActivity : AppCompatActivity(), LifecycleOwner, LocationClickListener 
                     view.queryHint = getString(com.pnuema.android.codingchallenge.R.string.search_locations)
 
                     //watch for more user input before firing off the api requests to cut down on traffic
-                    Observable.create(ObservableOnSubscribe<String> { subscriber ->
-                        view.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-                            override fun onQueryTextSubmit(query: String): Boolean {
-                                subscriber.onNext(query)
-                                return true
-                            }
-
-                            override fun onQueryTextChange(query: String): Boolean {
-                                //set the new search query on the view model to preserve state and update the 'source of truth'
-                                subscriber.onNext(query)
-                                return true
-                            }
-                        })
-                    })
-                        .debounce(500, TimeUnit.MILLISECONDS)
-                        .distinctUntilChanged()
-                        .subscribe{ query ->
-                            setSearchQuery(query)
-                        }
+                    setupQueryInputWatcher(view)
                 }
             }
         }
@@ -159,11 +150,40 @@ class MainActivity : AppCompatActivity(), LifecycleOwner, LocationClickListener 
         return true
     }
 
+    @SuppressLint("CheckResult")
+    private fun setupQueryInputWatcher(searchView: SearchView) {
+        Observable.create(ObservableOnSubscribe<String> { subscriber ->
+            searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String): Boolean {
+                    subscriber.onNext(query)
+                    return true
+                }
+
+                override fun onQueryTextChange(query: String): Boolean {
+                    //set the new search query on the view model to preserve state and update the 'source of truth'
+                    subscriber.onNext(query)
+                    return true
+                }
+            })
+        })
+            .debounce(500, TimeUnit.MILLISECONDS)
+            .distinctUntilChanged()
+            .subscribe{ query ->
+                setSearchQuery(query)
+            }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        adapter.notifyDataSetChanged()
+    }
+
     /**
      * Handle clicks on the location view holders and startup the details screen
      */
     override fun onLocationClicked(id: String) {
-        DetailsActivity.launch(this, id)
+        startActivityForResult(DetailsActivity.buildIntent(this, id), DetailsActivity.DETAILS_REQUEST_CODE)
     }
 
     /**

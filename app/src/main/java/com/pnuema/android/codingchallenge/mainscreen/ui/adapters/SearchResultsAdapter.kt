@@ -13,6 +13,10 @@ import com.pnuema.android.codingchallenge.mainscreen.ui.viewholders.LocationResu
 class SearchResultsAdapter(private val onClickListener: LocationClickListener): RecyclerView.Adapter<LocationResultViewHolder>() {
     private var locationDataItems: List<LocationResult> = ArrayList()
 
+    /**
+     * Sets the data that the adapter operates on.  Will automatically chose between a full notifydatasetchanged or
+     * using diffutils to only update the items that are needed to be updated.
+     */
     fun setLocationResults(locations: List<LocationResult>) {
         if (locations.isNullOrEmpty()) {
             locationDataItems = locations

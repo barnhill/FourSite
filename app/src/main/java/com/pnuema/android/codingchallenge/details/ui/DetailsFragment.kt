@@ -41,12 +41,10 @@ class DetailsFragment : Fragment() {
     companion object {
         private const val PERMISSION_CALL_REQUEST_CODE = 124
     }
-    private lateinit var viewModel: DetailsViewModel
-
+    private val viewModel: DetailsViewModel by lazy { ViewModelProviders.of(this).get(DetailsViewModel::class.java) }
     private var snackBar: Snackbar? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        viewModel = ViewModelProviders.of(this).get(DetailsViewModel::class.java)
         return inflater.inflate(R.layout.fragment_details, container, false)
     }
 
@@ -170,12 +168,15 @@ class DetailsFragment : Fragment() {
         }
 
         //show or hide the favorites based on if this location has been favorited by the user
+        details_is_favorite.visibility = View.INVISIBLE
         Executors.newSingleThreadExecutor().submit {
             venueDetail.id?.let { locationId ->
                 context?.let { context ->
                     val favorite = FavoritesDatabase.database(context).favoritesDao().getFavoriteById(locationId)
                     val isFavorite = favorite != null && favorite.id == locationId
+
                     details_is_favorite.setImageDrawable(ContextCompat.getDrawable(context, if (isFavorite) R.drawable.star_circle else R.drawable.star_circle_disabled))
+                    details_is_favorite.visibility = View.VISIBLE
                 }
             }
         }

@@ -1,14 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#03A9F4</color>
-    <color name="colorPrimaryDark">#0288D1</color>
-    <color name="colorAccent">#FF5722</color>
+    <color name="colorPrimary">@color/primary</color>
+    <color name="colorPrimaryDark">@color/primary_dark</color>
+    <color name="colorAccent">@color/accent</color>
 
-    <color name="textPrimary">#13161a</color>
-    <color name="textSecondary">#404040</color>
+    <color name="textPrimary">@color/primary_text</color>
+    <color name="textSecondary">@color/secondary_text</color>
 
-    <color name="errorBackground">#323232</color>
-    <color name="listDivider">#e6e7e9</color>
+    <color name="errorBackground">@color/background_dark</color>
+    <color name="listDivider">@color/divider</color>
 
-    <color name="disabled_grey">#ababab</color>
+    <color name="disabled_grey">@color/grey_disabled</color>
+
+    <!-- color palette -->
+    <color name="primary">#03a9f4</color>
+    <color name="primary_dark">#0288d1</color>
+    <color name="primary_light">#b3e5fc</color>
+    <color name="accent">#ff5722</color>
+    <color name="primary_text">#13161a</color>
+    <color name="secondary_text">#404040</color>
+    <color name="tertiary_text">#bdbdbd</color>
+    <color name="icons">#FFFFFF</color>
+    <color name="divider">#BDBDBD</color>
+    <color name="grey_disabled">#ababab</color>
+    <color name="background_dark">#323232</color>
 </resources>

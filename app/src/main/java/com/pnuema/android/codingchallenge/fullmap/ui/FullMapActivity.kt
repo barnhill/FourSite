@@ -23,15 +23,16 @@ import com.pnuema.android.codingchallenge.mainscreen.ui.models.LocationResult
  * Full map screen
  */
 class FullMapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener {
-    private lateinit var viewModel: FullMapViewModel
+    private val viewModel: FullMapViewModel by lazy { ViewModelProviders.of(this).get<FullMapViewModel>(FullMapViewModel::class.java) }
     private val mapMarkerToData: HashMap<Marker, LocationResult> = HashMap()
 
     companion object {
         const val PARAM_LOCATIONS: String = "PARAM_LOCATIONS"
-        fun launch(context: Context, locations: ArrayList<LocationResult>) {
-            val intent = Intent(context, FullMapActivity::class.java)
-            intent.putParcelableArrayListExtra(PARAM_LOCATIONS, locations)
-            context.startActivity(intent)
+        const val FULLMAP_REQUEST_CODE = 205
+
+        fun buildIntent(context: Context, locations: ArrayList<LocationResult>): Intent {
+            return Intent(context, FullMapActivity::class.java)
+                        .putParcelableArrayListExtra(PARAM_LOCATIONS, locations)
         }
     }
 
@@ -50,7 +51,6 @@ class FullMapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInf
         }
 
         //setup view model to persist the locations so they survive rotation
-        viewModel = ViewModelProviders.of(this).get<FullMapViewModel>(FullMapViewModel::class.java)
         viewModel.locationResults = intent.getParcelableArrayListExtra(PARAM_LOCATIONS)
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -81,7 +81,7 @@ class FullMapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInf
             val locationData = mapMarkerToData[marker]
             locationData?.id?.let {
                 //navigate to the detail screen
-                DetailsActivity.launch(this, it)
+                startActivity(DetailsActivity.buildIntent(this, it))
                 return
             }
 

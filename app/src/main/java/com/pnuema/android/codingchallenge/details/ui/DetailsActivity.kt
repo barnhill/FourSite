@@ -14,15 +14,15 @@ import kotlinx.android.synthetic.main.content_details.*
  * Activity for showing the detail screen
  */
 class DetailsActivity : AppCompatActivity() {
-    private lateinit var viewModel: DetailsViewModel
+    private val viewModel: DetailsViewModel by lazy { ViewModelProviders.of(fragment_details).get(DetailsViewModel::class.java) }
 
     companion object {
         private const val PARAM_LOCATION: String = "PARAM_LOCATION"
+        const val DETAILS_REQUEST_CODE = 204
 
-        fun launch(context: Context, locationId: String) {
-            val intent = Intent(context, DetailsActivity::class.java)
-            intent.putExtra(PARAM_LOCATION, locationId)
-            context.startActivity(intent)
+        fun buildIntent(context: Context, locationId: String): Intent {
+            return Intent(context, DetailsActivity::class.java)
+                        .putExtra(PARAM_LOCATION, locationId)
         }
     }
 
@@ -36,7 +36,6 @@ class DetailsActivity : AppCompatActivity() {
             it.setDisplayShowTitleEnabled(false)
         }
 
-        viewModel = ViewModelProviders.of(fragment_details).get(DetailsViewModel::class.java)
         viewModel.locationId = intent.getStringExtra(PARAM_LOCATION)
 
         //set app bar size to half the measured screen so that the map gets the top half

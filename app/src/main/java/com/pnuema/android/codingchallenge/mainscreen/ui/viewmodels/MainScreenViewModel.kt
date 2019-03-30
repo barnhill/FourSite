@@ -1,19 +1,28 @@
 package com.pnuema.android.codingchallenge.mainscreen.ui.viewmodels
 
+import android.content.Context
 import android.util.Log
+import androidx.annotation.WorkerThread
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.pnuema.android.codingchallenge.api.FoursquareServiceProvider
 import com.pnuema.android.codingchallenge.mainscreen.models.FoursquareResponse
 import com.pnuema.android.codingchallenge.mainscreen.ui.models.LocationResult
+import com.pnuema.android.codingchallenge.persistance.FavoritesDatabase
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.concurrent.Executors
 
 class MainScreenViewModel : ViewModel() {
     var searchFilter: String = ""
     var locationResults: MutableLiveData<ArrayList<LocationResult>> = MutableLiveData()
     var locationResultsError: MutableLiveData<String> = MutableLiveData()
+
+    interface LocationFavoriteChanged {
+        @WorkerThread
+        fun onFavoriteChangedStatus()
+    }
 
     private fun getLocationResults(query: String) {
         FoursquareServiceProvider.service.getLocationResults(query = query).enqueue(object :
@@ -51,6 +60,21 @@ class MainScreenViewModel : ViewModel() {
         getLocationResults(searchFilter)
     }
 
+    fun checkLocationResultsFavorites(context: Context, locations: ArrayList<LocationResult>, statusChangedListener: LocationFavoriteChanged) {
+        Executors.newSingleThreadExecutor().submit {
+            locations.forEach { location ->
+                location.id?.let {id ->
+                    FavoritesDatabase.database(context).favoritesDao().getFavoriteById(id).let {
+                        if ((it == null && location.isFavorite) || (it != null && !location.isFavorite)) {
+                            location.isFavorite = !location.isFavorite
+                            statusChangedListener.onFavoriteChangedStatus()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * Build the list of location results sorted by distance
      *
@@ -61,9 +85,9 @@ class MainScreenViewModel : ViewModel() {
             val resultsList = ArrayList<LocationResult>()
             response.venues?.forEach { resultsList.add(LocationResult(it)) }
 
-            return java.util.ArrayList(resultsList.sortedBy { it.locationDistance })
+            return ArrayList(resultsList.sortedBy { it.locationDistance })
         }
 
-        return java.util.ArrayList()
+        return ArrayList()
     }
 }

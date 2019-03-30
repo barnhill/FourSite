@@ -16,6 +16,7 @@ class LocationResult(private val venue: Venue) : ILocationResult, Parcelable {
     val locationDistance = venue.location?.distance
     val lat = venue.location?.lat
     val lng = venue.location?.lng
+    var isFavorite: Boolean = false
 
     constructor(parcel: Parcel) : this(parcel.readParcelable<Venue>(
         Venue::class.java.classLoader)!!)
@@ -55,6 +56,13 @@ class LocationResult(private val venue: Venue) : ILocationResult, Parcelable {
 
     override fun areContentsSame(other: ILocationResult): Boolean {
         val otherResult = other as LocationResult
-        return  id == otherResult.id
+        return  id == otherResult.id &&
+                locationCategory == otherResult.locationCategory &&
+                locationDistance == otherResult.locationDistance &&
+                locationIcon == otherResult.locationIcon &&
+                locationName == otherResult.locationName &&
+                lat == otherResult.lat &&
+                lng == otherResult.lng &&
+                isFavorite == otherResult.isFavorite
     }
 }
