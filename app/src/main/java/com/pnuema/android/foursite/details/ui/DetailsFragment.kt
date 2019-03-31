@@ -23,13 +23,13 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.material.snackbar.Snackbar
+import com.pnuema.android.foursite.R
 import com.pnuema.android.foursite.details.models.VenueDetail
 import com.pnuema.android.foursite.details.viewmodels.DetailsViewModel
 import com.pnuema.android.foursite.helpers.Errors
 import com.pnuema.android.foursite.helpers.MapUtils
 import com.pnuema.android.foursite.persistance.FavoritesDatabase
 import com.pnuema.android.foursite.persistance.daos.Favorite
-import com.pnuema.android.foursite.R
 import kotlinx.android.synthetic.main.fragment_details.*
 import java.text.DecimalFormat
 import java.util.concurrent.Executors
@@ -222,7 +222,7 @@ class DetailsFragment : Fragment() {
 
             //pin the pivot location
             viewModel.currentLocation?.let {latlng ->
-                MapUtils.setPivotMarker(getString(R.string.current_location_label), googleMap, latlng)
+                MapUtils.setPivotMarker(getString(R.string.current_location_label), googleMap, latlng.latitude, latlng.longitude)
                 latlngBuilder.include(latlng)
             }
 

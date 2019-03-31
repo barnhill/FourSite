@@ -13,11 +13,11 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
+import com.pnuema.android.foursite.R
 import com.pnuema.android.foursite.details.ui.DetailsActivity
 import com.pnuema.android.foursite.fullmap.viewmodels.FullMapViewModel
 import com.pnuema.android.foursite.helpers.MapUtils
 import com.pnuema.android.foursite.mainscreen.ui.models.LocationResult
-import com.pnuema.android.foursite.R
 
 /**
  * Full map screen
@@ -72,7 +72,7 @@ class FullMapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInf
      */
     override fun onMapReady(googleMap: GoogleMap) {
         viewModel.currentLocation?.let { latlng ->
-            MapUtils.setPivotMarker(getString(R.string.current_location_label), googleMap, latlng)
+            MapUtils.setPivotMarker(getString(R.string.current_location_label), googleMap, latlng.latitude, latlng.longitude)
             addAllLocations(googleMap)
             googleMap.setOnInfoWindowClickListener(this)
         }

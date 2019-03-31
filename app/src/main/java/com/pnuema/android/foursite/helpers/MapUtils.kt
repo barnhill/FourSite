@@ -15,25 +15,27 @@ class MapUtils {
         /**
          * Add a marker in current location and move the camera to the location
          */
-        fun setPivotMarker(label: String, googleMap: GoogleMap, currentLocation: LatLng) {
-            googleMap.addMarker(
-                MarkerOptions()
-                    .position(currentLocation)
-                    .title(label)
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
-            )
-            googleMap.moveCamera(CameraUpdateFactory.newLatLng(currentLocation))
+        fun setPivotMarker(label: String, googleMap: GoogleMap, lat: Double, lng: Double) {
+            setMarker(googleMap, lat, lng, label, BitmapDescriptorFactory.HUE_AZURE)
+            googleMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(lat, lng)))
+        }
+
+        /**
+         * Add standard marker to location
+         */
+        fun setMarker(googleMap: GoogleMap, lat: Double, lng: Double, title: String?): Marker {
+            return setMarker(googleMap, lat, lng, title, BitmapDescriptorFactory.HUE_ORANGE)
         }
 
         /**
          * Add marker to location
          */
-        fun setMarker(googleMap: GoogleMap, lat: Double, lng: Double, title: String?): Marker {
+        fun setMarker(googleMap: GoogleMap, lat: Double, lng: Double, title: String?, color: Float): Marker {
             val loc = LatLng(lat, lng)
             return googleMap.addMarker(MarkerOptions()
                 .position(loc)
                 .title(title)
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
+                .icon(BitmapDescriptorFactory.defaultMarker(color))
             )
         }
     }
