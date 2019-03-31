@@ -9,6 +9,7 @@ import com.pnuema.android.foursite.mainscreen.ui.models.LocationResult
 import com.pnuema.android.foursite.persistance.FavoritesDatabase
 import kotlinx.android.synthetic.main.location_result_item.view.*
 import java.util.concurrent.Executors
+import kotlin.math.roundToInt
 
 /**
  * View holder for display of the location information on the main screen of the app in a list.
@@ -24,8 +25,15 @@ class LocationResultViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(Layo
 
         //distance display
         itemView.locationDistance.text = ""
-        locationResult.locationDistance?.let {
-            itemView.locationDistance.text = context.resources.getQuantityString(R.plurals.meters, it.toInt(), it.toInt())
+        locationResult.locationDistance?.let {meters ->
+            //if longer than a mile display miles
+            if (meters >= 1609.34) {
+                val miles = (meters / 1609.34) //convert to miles
+                itemView.locationDistance.text = context.resources.getQuantityString(R.plurals.miles, miles.roundToInt(), String.format("%.1f", miles))
+            } else {
+                val feet = (meters / 3.28084).roundToInt() //convert to feet
+                itemView.locationDistance.text = context.resources.getQuantityString(R.plurals.feet, feet, feet.toString())
+            }
         }
 
         //load the image async with Glide so that the UI doesnt have to wait around on images to load (GlideConfig.kt)

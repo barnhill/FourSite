@@ -10,10 +10,16 @@
     <string name="close">Close</string>
 
     <string name="retry">Retry</string>
-    <plurals name="meters">
-        <item quantity="one">%d meter</item>
+    <plurals name="miles">
+        <item quantity="one">%s mile</item>
         <item quantity="zero">You are here</item>
-        <item quantity="other">%d meters</item>
+        <item quantity="other">%s miles</item>
+    </plurals>
+
+    <plurals name="feet">
+        <item quantity="one">%s foot</item>
+        <item quantity="zero">You are here</item>
+        <item quantity="other">%s feet</item>
     </plurals>
 
     <!-- favorite messages -->
