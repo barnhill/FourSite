@@ -1,7 +1,7 @@
-# CodingChallenge [![Build Status](https://www.travis-ci.org/barnhill/CodingChallenge.svg?branch=master)](https://www.travis-ci.org/barnhill/CodingChallenge) [![API](https://img.shields.io/badge/API-21%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=21)
+# CodingChallenge [![Build Status](https://www.travis-ci.org/barnhill/FourSite.svg?branch=master)](https://www.travis-ci.org/barnhill/FourSite) [![API](https://img.shields.io/badge/API-21%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=21)
 
 # Example Foursquare application
-This application will allow you to search for venues close to the heart of Seattle Washington.  It is an example of how to use a Room database for persistance, navigation, calling and parsing from an API using Retrofit and GSON, and last but not least using Google maps to show locations to a user .... WHEW!!
+This application will allow you to search for venues close to your current location.  It is an example of how to use a Room database for persistance, navigation, calling and parsing from an API using Retrofit and GSON, permission request handling, and last but not least using Google maps to show locations to a user .... WHEW!!
 
 ## To Run the application
 This project uses the Gradle build system. To build this project, use the gradlew build command or use "Import Project" in Android Studio.
@@ -14,15 +14,15 @@ There are two Gradle tasks for testing the project:
 
 # Screens
 
-The first screen will allow you to search for venues near the center of Seattle and displays them in a list.  It includes some information about the place and how far it is from the center of Seattle.  Users are allowed to favorite places from here by tapping on the star icon.  Tapping on a venue will take you to the detail screen.  Tapping the floating action button will take you to the full map screen.
+The first screen will allow you to search for venues near your current location and displays them in a list.  It includes some information about the place and how far it is from you.  Users are allowed to favorite places from here by tapping on the star icon.  Tapping on a venue will take you to the detail screen.  Tapping the floating action button will take you to the full map screen.
 
 ![Main screen](/images/example.png)
 
-The full map screen will allow the user to get a visual of all the places in the search results mapped on the same map with a different colored pin for the center of Seattle.  Tapping on a pin will display the name.  Clicking on this name will navigate to the details screen.
+The full map screen will allow the user to get a visual of all the places in the search results mapped on the same map with a different colored pin for your current location.  Tapping on a pin will display the name.  Clicking on this name will navigate to the details screen.
 
 ![Full map screen](/images/fullmap.png)
 
-The details screen will display the center of Seattle on the map on the top half along with the place its showing the details for.  This screen also shows some information about the selected venue (rating, address and a button to navigate to their website if its available)
+The details screen will display a pin on the map indicating your current position on the top half along with venues details.  This screen also shows some information about the selected venue (rating, address and a button to navigate to their website if its available), phone call capability, and favoriting/defavoriting a venue.
 
 ![Details screen](/images/details.png)
 
