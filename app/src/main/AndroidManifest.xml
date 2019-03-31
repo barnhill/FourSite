@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.pnuema.android.codingchallenge">
-    <!--
-         The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
-         Google Maps Android API v2, but you must specify either coarse or fine
-         location permissions for the 'MyLocation' functionality.
-    -->
+    package="com.pnuema.android.foursite">
+    
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
 
@@ -39,15 +35,15 @@
             android:name="com.bumptech.glide.integration.okhttp3.OkHttpGlideModule"
             android:value="GlideModule" />
         <meta-data
-            android:name="com.pnuema.android.codingchallenge.glide.GlideConfig"
+            android:name="com.pnuema.android.foursite.glide.GlideConfig"
             android:value="GlideModule" />
 
         <activity
-            android:name="com.pnuema.android.codingchallenge.fullmap.ui.FullMapActivity"
+            android:name=".fullmap.ui.FullMapActivity"
             android:label="@string/title_activity_full_map">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.pnuema.android.codingchallenge.mainscreen.ui.MainActivity" />
+                android:value=".mainscreen.ui.MainActivity" />
         </activity>
         <activity
             android:name=".details.ui.DetailsActivity"
