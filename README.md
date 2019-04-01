@@ -1,4 +1,4 @@
-# CodingChallenge [![Build Status](https://www.travis-ci.org/barnhill/FourSite.svg?branch=master)](https://www.travis-ci.org/barnhill/FourSite) [![API](https://img.shields.io/badge/API-21%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=21)
+# FourSite [![Build Status](https://www.travis-ci.org/barnhill/FourSite.svg?branch=master)](https://www.travis-ci.org/barnhill/FourSite) [![API](https://img.shields.io/badge/API-21%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=21)
 
 # Example Foursquare application
 This application will allow you to search for venues close to your current location.  It is an example of how to use a Room database for persistance, navigation, calling and parsing from an API using Retrofit and GSON, permission request handling, and last but not least using Google maps to show locations to a user .... WHEW!!
