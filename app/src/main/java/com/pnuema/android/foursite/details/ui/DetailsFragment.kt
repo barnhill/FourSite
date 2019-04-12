@@ -15,6 +15,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -24,6 +25,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.material.snackbar.Snackbar
 import com.pnuema.android.foursite.R
+import com.pnuema.android.foursite.databinding.FragmentDetailsBinding
 import com.pnuema.android.foursite.details.models.VenueDetail
 import com.pnuema.android.foursite.details.viewmodels.DetailsViewModel
 import com.pnuema.android.foursite.helpers.Errors
@@ -31,7 +33,6 @@ import com.pnuema.android.foursite.helpers.MapUtils
 import com.pnuema.android.foursite.persistance.FavoritesDatabase
 import com.pnuema.android.foursite.persistance.daos.Favorite
 import kotlinx.android.synthetic.main.fragment_details.*
-import java.text.DecimalFormat
 import java.util.concurrent.Executors
 
 /**
@@ -45,7 +46,17 @@ class DetailsFragment : Fragment() {
     private var snackBar: Snackbar? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_details, container, false)
+        // Inflate view and obtain an instance of the binding class.
+        val binding: FragmentDetailsBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_details, container, false)
+
+        // Specify the current fragment as the lifecycle owner
+        binding.lifecycleOwner = this
+
+        //assign the view model to be bound
+        binding.model = viewModel
+        binding.handlers = DetailsClickHandlers()
+
+        return binding.root
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -97,74 +108,21 @@ class DetailsFragment : Fragment() {
             return
         }
 
-        //populate the screen with details
-        details_name.text = venueDetail.name
-
-        if (venueDetail.ratingSignals != null) {
-            details_reviews.text = getString(R.string.details_review_count_format, venueDetail.ratingSignals)
-        } else {
-            details_reviews.text = getString(R.string.details_review_count_format, 0)
-        }
-
-        //ratings
-        details_rating.text = "0.0"
-        details_rating_bar.rating = 0.0f
-        details_rating_bar.visibility = View.VISIBLE
-        venueDetail.rating?.let { ratingScore ->
-            details_rating.text = DecimalFormat("#.##").format(ratingScore.div(2))
-            details_rating_bar.rating = (ratingScore.div(2)).toFloat()
-
-            //set the ratings bar to the color provided if its available
-            venueDetail.ratingColor?.let { ratingColor ->
+        //set the ratings bar to the color provided if its available
+        venueDetail.ratingColor?.let { ratingColor ->
+            if (ratingColor == "null") {
+                context?.let {
+                    DrawableCompat.setTint(details_rating_bar.progressDrawable, ContextCompat.getColor(it, R.color.disabled_grey))
+                }
+            } else {
                 DrawableCompat.setTint(details_rating_bar.progressDrawable, Color.parseColor("#$ratingColor"))
             }
         }
 
-        //hours
-        details_hours.text = venueDetail.hours?.status
-
-        //address fields
-        venueDetail.location?.formattedAddress.let {
-            var addressString = ""
-            it?.forEach { s ->
-                addressString += s + System.getProperty("line.separator")
-            }
-
-            details_address.text = addressString
-        }
-
-        //category
-        venueDetail.categories?.let {
-            details_category.text = if (it.isEmpty()) "" else it[0].shortName
-        }
-
-        //website button
-        if (venueDetail.canonicalUrl.isNullOrBlank() && venueDetail.shortUrl.isNullOrBlank()) {
-            details_web.visibility = View.GONE
-        } else {
-            if (venueDetail.canonicalUrl.isNullOrBlank()) {
-                details_web.text = venueDetail.shortUrl
-            } else {
-                details_web.text = venueDetail.canonicalUrl
-            }
-            details_web.visibility = View.VISIBLE
-            details_web.setOnClickListener {
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(details_web.text.toString())))
-            }
-        }
-
         //phone button
-        val contact = venueDetail.contact
         val number = venueDetail.contact?.phone
-        if (contact == null || contact.formattedPhone.isNullOrBlank() || number.isNullOrBlank()) {
-            details_phone.visibility = View.GONE
-        } else {
-            details_phone.visibility = View.VISIBLE
-            details_phone.text = contact.formattedPhone
-
-            details_phone.setOnClickListener {
-                handleCall(number)
-            }
+        details_phone.setOnClickListener {
+            handleCall(number?:"")
         }
 
         //show or hide the favorites based on if this location has been favorited by the user
@@ -181,7 +139,14 @@ class DetailsFragment : Fragment() {
             }
         }
 
-        //add click listener for adding/removing favorite locale
+        setupFavoriteAction(venueDetail)
+        setupMap(venueDetail)
+    }
+
+    /**
+     * add click listener for adding/removing favorite locale
+     */
+    private fun setupFavoriteAction(venueDetail: VenueDetail) {
         details_is_favorite.setOnClickListener {
             Executors.newSingleThreadExecutor().submit {
                 venueDetail.id?.let { locationId ->
@@ -212,7 +177,12 @@ class DetailsFragment : Fragment() {
                 }
             }
         }
+    }
 
+    /**
+     * Setup the map with current location and venue location pinned
+     */
+    private fun setupMap(venueDetail: VenueDetail) {
         (fragmentManager?.findFragmentById(R.id.details_map) as SupportMapFragment).getMapAsync { googleMap ->
             val latlngBuilder = LatLngBounds.Builder()
 

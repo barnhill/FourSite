@@ -6,8 +6,8 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.gms.maps.model.LatLng
-import com.pnuema.android.foursite.details.viewmodels.DetailsViewModel
 import com.pnuema.android.foursite.R
+import com.pnuema.android.foursite.details.viewmodels.DetailsViewModel
 import kotlinx.android.synthetic.main.activity_details.*
 import kotlinx.android.synthetic.main.content_details.*
 
