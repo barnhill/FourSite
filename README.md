@@ -15,15 +15,15 @@ There are two Gradle tasks for testing the project:
 
 The first screen will allow you to search for venues near your current location and displays them in a list.  It includes some information about the place and how far it is from you.  Users are allowed to favorite places from here by tapping on the star icon.  Tapping on a venue will take you to the detail screen.  Tapping the floating action button will take you to the full map screen.
 
-![Main screen](/images/example.png)
+<img src="/images/example.png" width="318" height="661" />
 
 The full map screen will allow the user to get a visual of all the places in the search results mapped on the same map with a different colored pin for your current location.  Tapping on a pin will display the name.  Clicking on this name will navigate to the details screen.
 
-![Full map screen](/images/fullmap.png)
+<img src="/images/fullmap.png" width="318" height="661" />
 
 The details screen will display a pin on the map indicating your current position on the top half along with venues details.  This screen also shows some information about the selected venue (rating, address and a button to navigate to their website if its available), phone call capability, and favoriting/defavoriting a venue.
 
-![Details screen](/images/details.png)
+<img src="/images/details.png" width="318" height="661" />
 
 ## Libraries Used
   * [Android Jetpack][0] - Components for core system capabilities
