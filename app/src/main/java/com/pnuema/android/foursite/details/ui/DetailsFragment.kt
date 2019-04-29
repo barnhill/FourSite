@@ -109,12 +109,11 @@ class DetailsFragment : Fragment() {
         }
 
         //set the ratings bar to the color provided if its available
+        context?.let {
+            DrawableCompat.setTint(details_rating_bar.progressDrawable, ContextCompat.getColor(it, R.color.disabled_grey))
+        }
         venueDetail.ratingColor?.let { ratingColor ->
-            if (ratingColor == "null") {
-                context?.let {
-                    DrawableCompat.setTint(details_rating_bar.progressDrawable, ContextCompat.getColor(it, R.color.disabled_grey))
-                }
-            } else {
+            if (ratingColor != "null") {
                 DrawableCompat.setTint(details_rating_bar.progressDrawable, Color.parseColor("#$ratingColor"))
             }
         }
