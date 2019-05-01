@@ -124,7 +124,7 @@ class DetailsFragment : Fragment() {
             handleCall(number?:"")
         }
 
-        //show or hide the favorites based on if this location has been favorited by the user
+        //colorize the favorites based on if this location has been favorited by the user
         details_is_favorite.visibility = View.INVISIBLE
         Executors.newSingleThreadExecutor().submit {
             venueDetail.id?.let { locationId ->

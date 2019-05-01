@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "481348537047",
+    "firebase_url": "https://swift-anvil-233701.firebaseio.com",
+    "project_id": "swift-anvil-233701",
+    "storage_bucket": "swift-anvil-233701.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:481348537047:android:84af3a2f818962c3",
+        "android_client_info": {
+          "package_name": "com.pnuema.android.foursite"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "481348537047-4anajuh5bs6vvr2m7vtkvgnau0el84kt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.pnuema.android.foursite",
+            "certificate_hash": "9f5990ab40e801abd8e7b15be756391d6f3bc574"
+          }
+        },
+        {
+          "client_id": "481348537047-rdv3su3pmq6a7dp5s4k5ieoqkvtfl18s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBF2pUP5WNXdLLFyFlpZ-HEzEszx4pR1GI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "481348537047-rdv3su3pmq6a7dp5s4k5ieoqkvtfl18s.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
