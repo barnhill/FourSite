@@ -37,8 +37,7 @@ class MainScreenViewModel : ViewModel() {
             return
         }
         val currentLatLng = currentLocation.latitude.toString() + "," + currentLocation.longitude.toString()
-        FoursquareServiceProvider.service.getLocationResults(query = query, latlng = currentLatLng)
-            .enqueue(object : Callback<FoursquareResponse> {
+        FoursquareServiceProvider.service.getLocationResults(query = query, latlng = currentLatLng).enqueue(object : Callback<FoursquareResponse> {
             override fun onFailure(call: Call<FoursquareResponse>, t: Throwable) {
                 Log.e(javaClass.simpleName, t.message)
                 locationResultsError.postValue(ERROR_CODE_RETRIEVE)
