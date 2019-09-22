@@ -7,6 +7,6 @@ android:
   - build-tools-28.0.3
   - platform-tools
   - tools
-  - android-28
-before_install: yes | sdkmanager "platforms;android-28"
+  - android-29
+before_install: yes | sdkmanager "platforms;android-29"
 script: ./gradlew assemble lint
