@@ -39,7 +39,7 @@ class DetailsActivity : AppCompatActivity() {
             it.setDisplayShowTitleEnabled(false)
         }
 
-        viewModel.locationId = intent.getStringExtra(PARAM_LOCATION)
+        viewModel.locationId = intent.getStringExtra(PARAM_LOCATION) ?: ""
         viewModel.currentLocation = intent.getParcelableExtra(PARAM_CURRENT_LOCATION)
 
         //set app bar size to half the measured screen so that the map gets the top half

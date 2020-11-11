@@ -4,7 +4,7 @@ import android.os.Parcel
 import android.os.Parcelable
 
 class Response() : Parcelable {
-    var venues: ArrayList<Venue>? = null
+    var venues: ArrayList<Venue> = arrayListOf()
 
     constructor(parcel: Parcel) : this() {
         parcel.readTypedList(venues, Venue)

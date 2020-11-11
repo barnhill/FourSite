@@ -53,7 +53,7 @@ class FullMapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInf
         }
 
         //setup view model to persist the locations so they survive rotation
-        viewModel.locationResults = intent.getParcelableArrayListExtra(PARAM_LOCATIONS)
+        viewModel.locationResults = intent.getParcelableArrayListExtra(PARAM_LOCATIONS)!!
         viewModel.currentLocation = intent.getParcelableExtra(PARAM_CURRENT_LOCATION)
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.

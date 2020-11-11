@@ -41,7 +41,7 @@ class DetailsViewModel : ViewModel() {
 
         FoursquareServiceProvider.service.getDetails(locationId).enqueue(object : Callback<DetailsResponse> {
             override fun onFailure(call: Call<DetailsResponse>, t: Throwable) {
-                Log.e(javaClass.simpleName, t.message)
+                Log.e(javaClass.simpleName, t.message ?: "")
                 error.postValue(t.message)
             }
 
