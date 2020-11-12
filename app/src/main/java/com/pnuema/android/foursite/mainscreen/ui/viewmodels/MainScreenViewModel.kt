@@ -95,7 +95,7 @@ class MainScreenViewModel : ViewModel() {
     private fun buildResults(foursquareResponse: FoursquareResponse): ArrayList<LocationResult> {
         foursquareResponse.response?.let { response ->
             val resultsList = ArrayList<LocationResult>()
-            response.venues?.forEach { resultsList.add(LocationResult(it)) }
+            response.venues.forEach { resultsList.add(LocationResult(it)) }
 
             return ArrayList(resultsList.sortedBy { it.locationDistance })
         }

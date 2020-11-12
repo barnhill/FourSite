@@ -22,7 +22,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.marginBottom
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.maps.model.LatLng
@@ -56,7 +56,7 @@ class MainActivity : AppCompatActivity(), LifecycleOwner, LocationClickListener 
         const val STATE_QUERY_STRING = "queryString"
         private const val PERMISSION_LOCATION_REQUEST_CODE = 579
     }
-    private val viewModel: MainScreenViewModel by lazy { ViewModelProviders.of(this).get<MainScreenViewModel>(MainScreenViewModel::class.java) }
+    private val viewModel: MainScreenViewModel by lazy { ViewModelProvider(this)[MainScreenViewModel::class.java] }
     private val adapter: SearchResultsAdapter by lazy { SearchResultsAdapter(this) }
     private val locationProviderClient: FusedLocationProviderClient by lazy { FusedLocationProviderClient(this) }
     private var snackBar: Snackbar? = null

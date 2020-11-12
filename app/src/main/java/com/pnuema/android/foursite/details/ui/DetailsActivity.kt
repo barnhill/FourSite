@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.maps.model.LatLng
 import com.pnuema.android.foursite.R
 import com.pnuema.android.foursite.details.viewmodels.DetailsViewModel
@@ -15,7 +15,7 @@ import kotlinx.android.synthetic.main.content_details.*
  * Activity for showing the detail screen
  */
 class DetailsActivity : AppCompatActivity() {
-    private val viewModel: DetailsViewModel by lazy { ViewModelProviders.of(fragment_details).get(DetailsViewModel::class.java) }
+    private val viewModel: DetailsViewModel by lazy { ViewModelProvider(fragment_details)[DetailsViewModel::class.java] }
 
     companion object {
         private const val PARAM_LOCATION: String = "PARAM_LOCATION"

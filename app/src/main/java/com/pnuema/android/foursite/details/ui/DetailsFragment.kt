@@ -18,7 +18,7 @@ import androidx.core.graphics.drawable.DrawableCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
@@ -42,7 +42,7 @@ class DetailsFragment : Fragment() {
     companion object {
         private const val PERMISSION_CALL_REQUEST_CODE = 124
     }
-    private val viewModel: DetailsViewModel by lazy { ViewModelProviders.of(this).get(DetailsViewModel::class.java) }
+    private val viewModel: DetailsViewModel by lazy { ViewModelProvider(this)[DetailsViewModel::class.java] }
     private var snackBar: Snackbar? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -182,7 +182,7 @@ class DetailsFragment : Fragment() {
      * Setup the map with current location and venue location pinned
      */
     private fun setupMap(venueDetail: VenueDetail) {
-        (fragmentManager?.findFragmentById(R.id.details_map) as SupportMapFragment).getMapAsync { googleMap ->
+        (parentFragmentManager.findFragmentById(R.id.details_map) as SupportMapFragment).getMapAsync { googleMap ->
             val latlngBuilder = LatLngBounds.Builder()
 
             googleMap.uiSettings.isScrollGesturesEnabled = false

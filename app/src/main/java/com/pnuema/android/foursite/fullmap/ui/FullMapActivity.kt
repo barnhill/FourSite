@@ -5,7 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -23,7 +23,7 @@ import com.pnuema.android.foursite.mainscreen.ui.models.LocationResult
  * Full map screen
  */
 class FullMapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener {
-    private val viewModel: FullMapViewModel by lazy { ViewModelProviders.of(this).get<FullMapViewModel>(FullMapViewModel::class.java) }
+    private val viewModel: FullMapViewModel by lazy { ViewModelProvider(this)[FullMapViewModel::class.java] }
     private val mapMarkerToData: HashMap<Marker, LocationResult> = HashMap()
 
     companion object {
