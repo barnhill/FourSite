@@ -10,6 +10,7 @@ import com.pnuema.android.foursite.R
 import com.pnuema.android.foursite.details.viewmodels.DetailsViewModel
 import kotlinx.android.synthetic.main.activity_details.*
 import kotlinx.android.synthetic.main.content_details.*
+import kotlin.math.roundToInt
 
 /**
  * Activity for showing the detail screen
@@ -43,7 +44,7 @@ class DetailsActivity : AppCompatActivity() {
         viewModel.currentLocation = intent.getParcelableExtra(PARAM_CURRENT_LOCATION)
 
         //set app bar size to half the measured screen so that the map gets the top half
-        details_app_bar_layout.layoutParams.height = Math.round(resources.configuration.screenHeightDp * resources.displayMetrics.density) / 2
+        details_app_bar_layout.layoutParams.height = (resources.configuration.screenHeightDp * resources.displayMetrics.density).roundToInt() / 2
     }
 
     override fun onSupportNavigateUp(): Boolean {
