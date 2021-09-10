@@ -22,7 +22,7 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <include layout="@layout/content_main"/>
+    <include android:id="@+id/main_content" layout="@layout/content_main"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/main_toggle_full_map"
@@ -33,6 +33,7 @@
         android:visibility="gone"
         android:tint="@android:color/white"
         app:srcCompat="@drawable/map_marker"
-        tools:visibility="visible"/>
+        tools:visibility="visible"
+        tools:ignore="ContentDescription" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

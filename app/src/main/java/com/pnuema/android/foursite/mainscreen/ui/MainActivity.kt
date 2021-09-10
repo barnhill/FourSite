@@ -12,6 +12,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import androidx.appcompat.app.AlertDialog
@@ -28,6 +29,7 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.snackbar.Snackbar
 import com.pnuema.android.foursite.R
+import com.pnuema.android.foursite.databinding.ActivityMainBinding
 import com.pnuema.android.foursite.details.ui.DetailsActivity
 import com.pnuema.android.foursite.fullmap.ui.FullMapActivity
 import com.pnuema.android.foursite.helpers.Errors
@@ -39,8 +41,6 @@ import com.pnuema.android.foursite.persistance.FavoritesDatabase
 import com.pnuema.android.foursite.persistance.daos.Favorite
 import io.reactivex.Observable
 import io.reactivex.ObservableOnSubscribe
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.content_main.*
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
@@ -62,16 +62,18 @@ class MainActivity : AppCompatActivity(), LifecycleOwner, LocationClickListener 
     private var snackBar: Snackbar? = null
     private var searchView: SearchView? = null
     private var currentLocation: Location? = null
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        setSupportActionBar(toolbar)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
 
         handleGetLocation()
 
-        main_locations_recycler.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
-        main_locations_recycler.adapter = adapter
+        binding.mainContent.mainLocationsRecycler.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
+        binding.mainContent.mainLocationsRecycler.adapter = adapter
 
         savedInstanceState?.let {
             val query = it.getString(STATE_QUERY_STRING)
@@ -80,10 +82,10 @@ class MainActivity : AppCompatActivity(), LifecycleOwner, LocationClickListener 
             }
         }
 
-        main_swipe_refresh.setColorSchemeColors(ContextCompat.getColor(this, R.color.colorAccent))
-        main_swipe_refresh.setOnRefreshListener {
+        binding.mainContent.mainSwipeRefresh.setColorSchemeColors(ContextCompat.getColor(this, R.color.colorAccent))
+        binding.mainContent.mainSwipeRefresh.setOnRefreshListener {
             if (viewModel.searchFilter.isBlank()) {
-                main_swipe_refresh.isRefreshing = false
+                binding.mainContent.mainSwipeRefresh.isRefreshing = false
                 return@setOnRefreshListener
             }
 
@@ -96,7 +98,7 @@ class MainActivity : AppCompatActivity(), LifecycleOwner, LocationClickListener 
             }
         }
 
-        main_toggle_full_map.setOnClickListener {
+        binding.mainToggleFullMap.setOnClickListener {
             viewModel.locationResults.value?.let { locations ->
                 currentLocation?.let { latLng ->
                     startActivityForResult(FullMapActivity.buildIntent(this, locations, LatLng(latLng.latitude, latLng.longitude)), FullMapActivity.FULLMAP_REQUEST_CODE)
@@ -104,9 +106,9 @@ class MainActivity : AppCompatActivity(), LifecycleOwner, LocationClickListener 
             }
         }
 
-        viewModel.locationResults.observe(this, Observer<ArrayList<LocationResult>> {
+        viewModel.locationResults.observe(this, {
             //cancel the progress indicator
-            main_swipe_refresh.isRefreshing = false
+            binding.mainContent.mainSwipeRefresh.isRefreshing = false
             dismissSnackBar()
 
             if (it.isEmpty()) {
@@ -133,11 +135,11 @@ class MainActivity : AppCompatActivity(), LifecycleOwner, LocationClickListener 
             dismissSnackBar()
             if (it != null) {
                 when (it) {
-                    MainScreenViewModel.ERROR_CODE_RETRIEVE -> snackBar = Errors.showError(main_coordinator, R.string.request_failed_main, R.string.retry, View.OnClickListener {
+                    MainScreenViewModel.ERROR_CODE_RETRIEVE -> snackBar = Errors.showError(binding.mainCoordinator, R.string.request_failed_main, R.string.retry, View.OnClickListener {
                         dismissSnackBar()
                         viewModel.refresh(currentLocation)
                     })
-                    MainScreenViewModel.ERROR_CODE_NO_CURRENT_LOCATION -> snackBar = Errors.showError(main_coordinator, R.string.error_location_permission_denied, R.string.enable, View.OnClickListener {
+                    MainScreenViewModel.ERROR_CODE_NO_CURRENT_LOCATION -> snackBar = Errors.showError(binding.mainCoordinator, R.string.error_location_permission_denied, R.string.enable, View.OnClickListener {
                         //launch app detail settings page to let the user enable the permission that they denied
                         val intent = Intent()
                         intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
@@ -259,7 +261,7 @@ class MainActivity : AppCompatActivity(), LifecycleOwner, LocationClickListener 
             if (query.isBlank()) {
                 viewModel.setQuery("", currentLocation)
             } else {
-                main_swipe_refresh.isRefreshing = true
+                binding.mainContent.mainSwipeRefresh.isRefreshing = true
                 dismissSnackBar()
                 viewModel.setQuery(query, currentLocation)
             }
@@ -302,12 +304,12 @@ class MainActivity : AppCompatActivity(), LifecycleOwner, LocationClickListener 
     private fun setFullMapVisibleState(locationResults: ArrayList<LocationResult>) {
         if (locationResults.isEmpty()) {
             //empty or blank query so lets hide the full map button
-            main_toggle_full_map.animate().translationY((main_toggle_full_map.height + main_toggle_full_map.marginBottom).toFloat()).setInterpolator(AccelerateDecelerateInterpolator()).start()
-            main_toggle_full_map.hide()
+            binding.mainToggleFullMap.animate().translationY((binding.mainToggleFullMap.height + binding.mainToggleFullMap.marginBottom).toFloat()).setInterpolator(AccelerateDecelerateInterpolator()).start()
+            binding.mainToggleFullMap.hide()
         } else {
             //results exist or the search query is not blank so
-            main_toggle_full_map.show()
-            main_toggle_full_map.animate().translationY(0f).setInterpolator(AccelerateDecelerateInterpolator()).start()
+            binding.mainToggleFullMap.show()
+            binding.mainToggleFullMap.animate().translationY(0f).setInterpolator(AccelerateDecelerateInterpolator()).start()
         }
     }
 
@@ -317,12 +319,12 @@ class MainActivity : AppCompatActivity(), LifecycleOwner, LocationClickListener 
      */
     private fun toggleEmptyState(state: Boolean) {
         if (state) {
-            main_swipe_refresh.visibility = View.GONE
-            group_empty_data.visibility = View.VISIBLE
+            binding.mainContent.mainSwipeRefresh.visibility = View.GONE
+            binding.mainContent.groupEmptyData.visibility = View.VISIBLE
 
         } else {
-            main_swipe_refresh.visibility = View.VISIBLE
-            group_empty_data.visibility = View.GONE
+            binding.mainContent.mainSwipeRefresh.visibility = View.VISIBLE
+            binding.mainContent.groupEmptyData.visibility = View.GONE
         }
     }
 
@@ -342,6 +344,7 @@ class MainActivity : AppCompatActivity(), LifecycleOwner, LocationClickListener 
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             PERMISSION_LOCATION_REQUEST_CODE -> {
 

@@ -15,7 +15,6 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -32,7 +31,6 @@ import com.pnuema.android.foursite.helpers.Errors
 import com.pnuema.android.foursite.helpers.MapUtils
 import com.pnuema.android.foursite.persistance.FavoritesDatabase
 import com.pnuema.android.foursite.persistance.daos.Favorite
-import kotlinx.android.synthetic.main.fragment_details.*
 import java.util.concurrent.Executors
 
 /**
@@ -42,25 +40,20 @@ class DetailsFragment : Fragment() {
     companion object {
         private const val PERMISSION_CALL_REQUEST_CODE = 124
     }
-    private val viewModel: DetailsViewModel by lazy { ViewModelProvider(this)[DetailsViewModel::class.java] }
+    private val viewModel: DetailsViewModel by lazy { ViewModelProvider(requireActivity())[DetailsViewModel::class.java] }
     private var snackBar: Snackbar? = null
+    private lateinit var binding: FragmentDetailsBinding
+    private val clickHandlers = DetailsClickHandlers()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         // Inflate view and obtain an instance of the binding class.
-        val binding: FragmentDetailsBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_details, container, false)
-
-        // Specify the current fragment as the lifecycle owner
-        binding.lifecycleOwner = this
-
-        //assign the view model to be bound
-        binding.model = viewModel
-        binding.handlers = DetailsClickHandlers()
+        binding = FragmentDetailsBinding.inflate(inflater, container, false)
 
         return binding.root
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         //handle bad data by going back if no location id
         val locationId = viewModel.locationId
@@ -110,43 +103,96 @@ class DetailsFragment : Fragment() {
 
         //set the ratings bar to the color provided if its available
         context?.let {
-            DrawableCompat.setTint(details_rating_bar.progressDrawable, ContextCompat.getColor(it, R.color.disabled_grey))
+            DrawableCompat.setTint(binding.detailsRatingBar.progressDrawable, ContextCompat.getColor(it, R.color.disabled_grey))
         }
         venueDetail.ratingColor?.let { ratingColor ->
             if (ratingColor != "null") {
-                DrawableCompat.setTint(details_rating_bar.progressDrawable, Color.parseColor("#$ratingColor"))
+                DrawableCompat.setTint(binding.detailsRatingBar.progressDrawable, Color.parseColor("#$ratingColor"))
             }
         }
 
-        //phone button
-        val number = venueDetail.contact?.phone
-        details_phone.setOnClickListener {
-            handleCall(number?:"")
+        //venue name
+        viewModel.venueName.observe(viewLifecycleOwner) {
+            binding.detailsName.text = it
+        }
+
+        //venue rating
+        viewModel.venueRating.observe(viewLifecycleOwner) {
+            binding.detailsRating.text = it
+        }
+
+        //rating stars
+        viewModel.venueBar.observe(viewLifecycleOwner) {
+            binding.detailsRatingBar.rating = it
+        }
+
+        //reviews count
+        viewModel.venueReviews.observe(viewLifecycleOwner) {
+            binding.detailsReviews.text = it.toString()
+        }
+
+        //category
+        viewModel.venueCategory.observe(viewLifecycleOwner) {
+            binding.detailsCategory.text = it
+        }
+
+        //address
+        viewModel.venueAddress.observe(viewLifecycleOwner) {
+            binding.detailsAddress.text = it
+        }
+
+        //hours
+        viewModel.venueHours.observe(viewLifecycleOwner) {
+            binding.detailsHours.text = it
+        }
+
+        //website
+        viewModel.venueWebsite.observe(viewLifecycleOwner) {
+            binding.detailsWeb.text = it
+            binding.detailsWeb.visibility = viewModel.websiteVisibility(it)
+        }
+
+        //phone
+        viewModel.venuePhone.observe(viewLifecycleOwner) {
+            binding.detailsPhone.text = it
+            binding.detailsPhone.visibility = viewModel.phoneVisibility(it)
         }
 
         //colorize the favorites based on if this location has been favorited by the user
-        details_is_favorite.visibility = View.INVISIBLE
+        binding.detailsIsFavorite.visibility = View.INVISIBLE
         Executors.newSingleThreadExecutor().submit {
             venueDetail.id?.let { locationId ->
                 context?.let { context ->
                     val favorite = FavoritesDatabase.database(context).favoritesDao().getFavoriteById(locationId)
                     val isFavorite = favorite != null && favorite.id == locationId
 
-                    details_is_favorite.setImageDrawable(ContextCompat.getDrawable(context, if (isFavorite) R.drawable.star_circle else R.drawable.star_circle_disabled))
-                    details_is_favorite.visibility = View.VISIBLE
+                    binding.detailsIsFavorite.setImageDrawable(ContextCompat.getDrawable(context, if (isFavorite) R.drawable.star_circle else R.drawable.star_circle_disabled))
+                    binding.detailsIsFavorite.visibility = View.VISIBLE
                 }
             }
         }
 
         setupFavoriteAction(venueDetail)
         setupMap(venueDetail)
+        setupClickListeners(venueDetail)
+    }
+
+    private fun setupClickListeners(venueDetail: VenueDetail) {
+        binding.detailsWeb.setOnClickListener {
+            venueDetail.url?.let { url -> clickHandlers.onWebsiteClick(it.context, url) }
+        }
+
+        binding.detailsPhone.setOnClickListener {
+            val number = venueDetail.contact?.phone
+            handleCall(number ?: "")
+        }
     }
 
     /**
      * add click listener for adding/removing favorite locale
      */
     private fun setupFavoriteAction(venueDetail: VenueDetail) {
-        details_is_favorite.setOnClickListener {
+        binding.detailsIsFavorite.setOnClickListener {
             Executors.newSingleThreadExecutor().submit {
                 venueDetail.id?.let { locationId ->
                     context?.let { context ->
@@ -169,7 +215,7 @@ class DetailsFragment : Fragment() {
                             }
                         }
 
-                        details_is_favorite.setImageDrawable(
+                        binding.detailsIsFavorite.setImageDrawable(
                             ContextCompat.getDrawable(context, if (!isFavorite) R.drawable.star_circle else R.drawable.star_circle_disabled)
                         )
                     }
@@ -224,7 +270,7 @@ class DetailsFragment : Fragment() {
 
                 if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
                     //permission denied by user
-                    details_phone.isEnabled = false
+                    binding.detailsPhone.isEnabled = false
                 } else {
                     //permission granted
                     val number = viewModel.details.value?.contact?.phone

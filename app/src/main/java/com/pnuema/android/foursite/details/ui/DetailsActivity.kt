@@ -6,17 +6,16 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.maps.model.LatLng
-import com.pnuema.android.foursite.R
+import com.pnuema.android.foursite.databinding.ActivityDetailsBinding
 import com.pnuema.android.foursite.details.viewmodels.DetailsViewModel
-import kotlinx.android.synthetic.main.activity_details.*
-import kotlinx.android.synthetic.main.content_details.*
 import kotlin.math.roundToInt
 
 /**
  * Activity for showing the detail screen
  */
 class DetailsActivity : AppCompatActivity() {
-    private val viewModel: DetailsViewModel by lazy { ViewModelProvider(fragment_details)[DetailsViewModel::class.java] }
+    private val viewModel: DetailsViewModel by lazy { ViewModelProvider(this)[DetailsViewModel::class.java] }
+    private lateinit var binding: ActivityDetailsBinding
 
     companion object {
         private const val PARAM_LOCATION: String = "PARAM_LOCATION"
@@ -32,8 +31,9 @@ class DetailsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_details)
-        setSupportActionBar(toolbar)
+        binding = ActivityDetailsBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
 
         supportActionBar?.let {
             it.setDisplayHomeAsUpEnabled(true)
@@ -44,7 +44,7 @@ class DetailsActivity : AppCompatActivity() {
         viewModel.currentLocation = intent.getParcelableExtra(PARAM_CURRENT_LOCATION)
 
         //set app bar size to half the measured screen so that the map gets the top half
-        details_app_bar_layout.layoutParams.height = (resources.configuration.screenHeightDp * resources.displayMetrics.density).roundToInt() / 2
+        binding.detailsAppBarLayout.layoutParams.height = (resources.configuration.screenHeightDp * resources.displayMetrics.density).roundToInt() / 2
     }
 
     override fun onSupportNavigateUp(): Boolean {

@@ -5,7 +5,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
     tools:context=".details.ui.DetailsActivity">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -19,7 +18,7 @@
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <include layout="@layout/content_details"/>
+            <include android:id="@+id/details_contents" layout="@layout/content_details"/>
 
         </androidx.core.widget.NestedScrollView>
 
@@ -37,7 +36,7 @@
                 app:layout_scrollFlags="scroll|enterAlwaysCollapsed|exitUntilCollapsed|snap"
                 app:statusBarScrim="?attr/colorPrimary">
 
-                <fragment
+                <androidx.fragment.app.FragmentContainerView
                     android:id="@+id/details_map"
                     android:name="com.google.android.gms.maps.SupportMapFragment"
                     android:layout_width="match_parent"
