@@ -23,14 +23,14 @@ class MapUtils {
         /**
          * Add standard marker to location
          */
-        fun setMarker(googleMap: GoogleMap, lat: Double, lng: Double, title: String?): Marker {
+        fun setMarker(googleMap: GoogleMap, lat: Double, lng: Double, title: String?): Marker? {
             return setMarker(googleMap, lat, lng, title, BitmapDescriptorFactory.HUE_ORANGE)
         }
 
         /**
          * Add marker to location
          */
-        fun setMarker(googleMap: GoogleMap, lat: Double, lng: Double, title: String?, color: Float): Marker {
+        private fun setMarker(googleMap: GoogleMap, lat: Double, lng: Double, title: String?, color: Float): Marker? {
             val loc = LatLng(lat, lng)
             return googleMap.addMarker(MarkerOptions()
                 .position(loc)

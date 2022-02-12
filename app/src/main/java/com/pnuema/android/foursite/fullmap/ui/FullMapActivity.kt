@@ -81,20 +81,18 @@ class FullMapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInf
     /**
      * Handles title popup clicks to navigate to the details screen
      */
-    override fun onInfoWindowClick(marker: Marker?) {
-        marker?.let {
-            val locationData = mapMarkerToData[marker]
-            locationData?.id?.let { locationId ->
-                //navigate to the detail screen
-                viewModel.currentLocation?.let {latLng: LatLng ->
-                    startActivity(DetailsActivity.buildIntent(this, locationId, latLng))
-                }
-                return
+    override fun onInfoWindowClick(marker: Marker) {
+        val locationData = mapMarkerToData[marker]
+        locationData?.id?.let { locationId ->
+            //navigate to the detail screen
+            viewModel.currentLocation?.let {latLng: LatLng ->
+                startActivity(DetailsActivity.buildIntent(this, locationId, latLng))
             }
-
-            //display an error message since we could not navigate to details due to location data being null
-            Toast.makeText(this, R.string.error_location_data, Toast.LENGTH_LONG).show()
+            return
         }
+
+        //display an error message since we could not navigate to details due to location data being null
+        Toast.makeText(this, R.string.error_location_data, Toast.LENGTH_LONG).show()
 
         return
     }
@@ -111,7 +109,7 @@ class FullMapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInf
         val latlngBuilder = LatLngBounds.Builder()
         viewModel.locationResults.forEach {
             if (it.lat != null && it.lng != null) {
-                val marker = MapUtils.setMarker(googleMap, it.lat, it.lng, it.locationName)
+                val marker = MapUtils.setMarker(googleMap, it.lat, it.lng, it.locationName) ?: return@forEach
                 latlngBuilder.include(LatLng(it.lat, it.lng))
 
                 mapMarkerToData[marker] = it
@@ -119,7 +117,7 @@ class FullMapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInf
         }
 
         //include the center point in the calculation for the bounds
-        latlngBuilder.include(viewModel.currentLocation)
+        viewModel.currentLocation?.let { latlngBuilder.include(it) }
 
         //add padding as a percentage of the smallest width of the device
         val padding = (resources.configuration.smallestScreenWidthDp * 0.40).toInt()
