@@ -26,6 +26,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.snackbar.Snackbar
 import com.pnuema.android.foursite.R
@@ -58,7 +59,7 @@ class MainActivity : AppCompatActivity(), LifecycleOwner, LocationClickListener 
     }
     private val viewModel: MainScreenViewModel by lazy { ViewModelProvider(this)[MainScreenViewModel::class.java] }
     private val adapter: SearchResultsAdapter by lazy { SearchResultsAdapter(this) }
-    private val locationProviderClient: FusedLocationProviderClient by lazy { FusedLocationProviderClient(this) }
+    private val locationProviderClient: FusedLocationProviderClient by lazy { LocationServices.getFusedLocationProviderClient(this) }
     private var snackBar: Snackbar? = null
     private var searchView: SearchView? = null
     private var currentLocation: Location? = null
