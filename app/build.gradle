@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 
+def mapsAPIKey = System.getenv("foursiteGoogleMapsApiKey") == null ? System.getProperty('foursiteGoogleMapsApiKey') : "${System.getenv("foursiteGoogleMapsApiKey")}"
 android {
     namespace = "com.pnuema.android.foursite"
     compileSdkVersion 33
@@ -12,6 +13,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        manifestPlaceholders.mapsAPIKey = [API_KEY: "$mapsAPIKey"]
     }
     buildTypes {
         release {
@@ -60,7 +62,7 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.10.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    implementation 'com.google.android.material:material:1.8.0'
+    implementation 'com.google.android.material:material:1.9.0'
     implementation 'com.google.android.gms:play-services-maps:18.1.0'
     implementation 'com.google.android.gms:play-services-location:21.0.1'
     implementation 'com.google.code.gson:gson:2.9.0'

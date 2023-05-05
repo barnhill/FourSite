@@ -1,4 +1,0 @@
-<resources>
-    <!-- Google maps API key ... would generally be in external gradle.properties or environment variable but for ease of demo app its in here -->
-    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyBF2pUP5WNXdLLFyFlpZ-HEzEszx4pR1GI</string>
-</resources>
