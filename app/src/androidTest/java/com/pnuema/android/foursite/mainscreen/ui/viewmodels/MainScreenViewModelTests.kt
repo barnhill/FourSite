@@ -41,10 +41,11 @@ class MainScreenViewModelTests {
         viewModel.searchFilter = ""
 
         val observer = lambdaMock<(ArrayList<LocationResult>) -> Unit>()
-        val lifecycle = LifecycleRegistry(mock(LifecycleOwner::class.java))
-        lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
+        val lifecycle = mock(LifecycleOwner::class.java)
+        val lifecycleRegistry = LifecycleRegistry(lifecycle)
+        lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
 
-        viewModel.locationResults.observe({lifecycle}) {
+        viewModel.locationResults.observe(lifecycle) {
             it?.let(observer)
         }
 
